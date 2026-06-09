@@ -8,9 +8,6 @@ map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
 map("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
 
--- Use <Esc> to exit terminal mode
-map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-
 -- Vim-style window navigation
 map("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
 map("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
