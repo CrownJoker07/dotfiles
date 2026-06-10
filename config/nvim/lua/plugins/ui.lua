@@ -34,7 +34,7 @@ return {
     event = "VeryLazy",
     opts = {
       options = {
-        theme = "catppuccin",
+        theme = "auto",
         globalstatus = true,
         component_separators = "",
         section_separators = "",
