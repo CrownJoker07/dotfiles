@@ -43,7 +43,7 @@ install_homebrew() {
 install_brew_packages() {
   section "Brew packages"
 
-  local formulae=(neovim git tmux fzf ripgrep lazygit stylua shfmt node rustup)
+  local formulae=(neovim git tmux fzf ripgrep lazygit stylua shfmt node rustup tree-sitter-cli)
   local missing=()
   local formula
 
