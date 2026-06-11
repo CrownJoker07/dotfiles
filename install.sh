@@ -17,6 +17,7 @@ echo "Dotfiles dir: $DOTFILES_DIR"
 echo "Config dir:   $XDG_CONFIG_DIR"
 echo
 
+"$DOTFILES_DIR/scripts/install-macos.sh"
 "$DOTFILES_DIR/scripts/symlink.sh" "$@"
 
 echo
