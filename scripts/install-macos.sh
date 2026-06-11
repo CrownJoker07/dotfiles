@@ -42,21 +42,79 @@ install_homebrew() {
 
 install_brew_packages() {
   section "Brew packages"
-  local packages=(neovim git tmux alacritty fzf ripgrep lazygit stylua shfmt node rustup-init)
-  echo "→ ${packages[*]}"
-  brew install "${packages[@]}"
-  echo "✓ installed"
+
+  local formulae=(neovim git tmux fzf ripgrep lazygit stylua shfmt node rustup)
+  local missing=()
+  local formula
+
+  for formula in "${formulae[@]}"; do
+    if brew list --formula "$formula" >/dev/null 2>&1; then
+      echo "✓ $formula already installed"
+    else
+      missing+=("$formula")
+    fi
+  done
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    echo "→ installing: ${missing[*]}"
+    brew install "${missing[@]}"
+  fi
+
+  if command -v alacritty >/dev/null 2>&1 || brew list --cask alacritty >/dev/null 2>&1; then
+    echo "✓ alacritty already installed"
+  else
+    echo "→ installing: alacritty"
+    brew install --cask alacritty
+  fi
+
+  echo "✓ brew packages ready"
+}
+
+jetbrains_nerd_font_available() {
+  local dir font
+
+  for dir in "$HOME/Library/Fonts" "/Library/Fonts"; do
+    [ -d "$dir" ] || continue
+    for font in "$dir"/JetBrainsMono*NerdFont*.ttf; do
+      [ -e "$font" ] && return 0
+    done
+  done
+
+  return 1
+}
+
+validate_jetbrains_nerd_font() {
+  if jetbrains_nerd_font_available; then
+    echo "✓ font files available"
+    return 0
+  fi
+
+  echo "⊘ warning: JetBrains Mono Nerd Font files were not found in ~/Library/Fonts or /Library/Fonts"
+  echo "  Fully restart Alacritty after the font install finishes. If the warning persists, re-run this script."
+  return 1
 }
 
 install_nerd_font() {
   section "Nerd Font (JetBrains Mono)"
-  if brew list --cask font-jetbrains-mono-nerd-font >/dev/null 2>&1; then
-    echo "✓ already installed"
+
+  local cask="font-jetbrains-mono-nerd-font"
+
+  if brew list --cask "$cask" >/dev/null 2>&1; then
+    if jetbrains_nerd_font_available; then
+      echo "✓ already installed and available"
+      return
+    fi
+
+    echo "⊘ cask installed, but font files are missing"
+    echo "→ reinstalling..."
+    brew reinstall --cask "$cask"
+    validate_jetbrains_nerd_font || true
     return
   fi
+
   echo "→ installing..."
-  brew install --cask font-jetbrains-mono-nerd-font
-  echo "✓ installed"
+  brew install --cask "$cask"
+  validate_jetbrains_nerd_font || true
 }
 
 install_prettier() {
