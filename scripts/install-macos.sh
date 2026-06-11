@@ -128,8 +128,26 @@ install_prettier() {
   echo "✓ installed"
 }
 
+install_dotnet_tool() {
+  local tool="$1"
+
+  if command -v "$tool" >/dev/null 2>&1; then
+    echo "✓ $tool already installed"
+    return
+  fi
+
+  echo "→ installing $tool..."
+  if dotnet tool install -g "$tool"; then
+    echo "✓ $tool installed"
+  else
+    echo "⊘ $tool install failed (check network, NuGet access, or ~/.dotnet/tools PATH)"
+  fi
+}
+
 install_dotnet_tools() {
   section ".NET SDK + tools"
+
+  export PATH="$HOME/.dotnet/tools:$PATH"
 
   if ! command -v dotnet >/dev/null 2>&1; then
     if brew list --cask dotnet-sdk >/dev/null 2>&1; then
@@ -143,30 +161,30 @@ install_dotnet_tools() {
     echo "✓ dotnet already available"
   fi
 
-  export PATH="$HOME/.dotnet/tools:$PATH"
+  if ! command -v dotnet >/dev/null 2>&1; then
+    echo "⊘ dotnet is still unavailable; restart your shell and re-run this script"
+    return
+  fi
 
-  for tool in csharpier roslyn-language-server; do
-    if command -v "$tool" >/dev/null 2>&1; then
-      echo "✓ $tool already installed"
-    else
-      echo "→ installing $tool..."
-      dotnet tool install -g "$tool" || echo "⊘ $tool install failed (may need a new shell after dotnet-sdk)"
-    fi
-  done
+  install_dotnet_tool csharpier
 }
 
 print_summary() {
   section "Post-install notes"
   cat <<'EOF'
-  1. If you just installed rustup-init, run:
+  1. If you just installed rustup, run:
        rustup-init -y
      then restart your shell.
 
   2. If you just installed dotnet-sdk, restart your shell so
-     ~/.dotnet/tools is on PATH, then re-run this script to
-     finish installing csharpier and roslyn-language-server.
+     ~/.dotnet/tools is on PATH, then re-run this script if
+     csharpier was not available.
 
-  3. Set JetBrains Mono Nerd Font as your terminal font
+  3. Roslyn language server is managed by Neovim Mason.
+     Open Neovim and run :MasonInstall roslyn if it is not
+     installed automatically.
+
+  4. Set JetBrains Mono Nerd Font as your terminal font
      (Alacritty config should already reference it).
 EOF
 }
