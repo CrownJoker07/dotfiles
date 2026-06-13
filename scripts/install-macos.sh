@@ -60,13 +60,6 @@ install_brew_packages() {
     brew install "${missing[@]}"
   fi
 
-  if command -v alacritty >/dev/null 2>&1 || brew list --cask alacritty >/dev/null 2>&1; then
-    echo "✓ alacritty already installed"
-  else
-    echo "→ installing: alacritty"
-    brew install --cask alacritty
-  fi
-
   echo "✓ brew packages ready"
 }
 
@@ -90,7 +83,7 @@ validate_jetbrains_nerd_font() {
   fi
 
   echo "⊘ warning: JetBrains Mono Nerd Font files were not found in ~/Library/Fonts or /Library/Fonts"
-  echo "  Fully restart Alacritty after the font install finishes. If the warning persists, re-run this script."
+  echo "  Fully restart Terminal after the font install finishes. If the warning persists, re-run this script."
   return 1
 }
 
@@ -183,9 +176,6 @@ print_summary() {
   3. Roslyn language server is managed by Neovim Mason.
      Open Neovim and run :MasonInstall roslyn if it is not
      installed automatically.
-
-  4. Set JetBrains Mono Nerd Font as your terminal font
-     (Alacritty config should already reference it).
 EOF
 }
 
