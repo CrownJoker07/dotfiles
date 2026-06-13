@@ -239,6 +239,30 @@ install_dotnet_tools() {
   echo "✓ .NET tools ready"
 }
 
+install_tmux_plugins() {
+  section "tmux plugins"
+
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+
+  if [ -d "$tpm_dir" ] && [ -f "$tpm_dir/tpm" ]; then
+    echo "✓ tpm already installed"
+  else
+    echo "→ installing tpm..."
+    mkdir -p "$tpm_dir"
+    git clone https://github.com/tmux-plugins/tpm.git "$tpm_dir"
+
+    if [ ! -f "$tpm_dir/tpm" ]; then
+      echo "✗ tpm install failed"
+      return 1
+    fi
+    echo "✓ tpm installed"
+  fi
+
+  echo "→ installing plugins via tpm..."
+  "$tpm_dir/bin/install_plugins"
+  echo "✓ tmux plugins installed"
+}
+
 print_summary() {
   section "Post-install notes"
   cat <<'EOF'
@@ -260,4 +284,5 @@ ensure_jetbrains_nerd_font
 configure_terminal_app
 install_npm_globals
 install_dotnet_tools
+install_tmux_plugins
 print_summary

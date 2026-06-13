@@ -253,6 +253,30 @@ configure_zsh() {
   echo "✓ switched (restart session to apply)"
 }
 
+install_tmux_plugins() {
+  section "tmux plugins"
+
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+
+  if [ -d "$tpm_dir" ] && [ -f "$tpm_dir/tpm" ]; then
+    echo "✓ tpm already installed"
+  else
+    echo "→ installing tpm..."
+    mkdir -p "$tpm_dir"
+    git clone https://github.com/tmux-plugins/tpm.git "$tpm_dir"
+
+    if [ ! -f "$tpm_dir/tpm" ]; then
+      echo "✗ tpm install failed"
+      return 1
+    fi
+    echo "✓ tpm installed"
+  fi
+
+  echo "→ installing plugins via tpm..."
+  "$tpm_dir/bin/install_plugins"
+  echo "✓ tmux plugins installed"
+}
+
 print_summary() {
   section "Post-install"
   cat <<'EOF'
@@ -278,6 +302,7 @@ install_aur_packages
 install_npm_globals
 install_dotnet_tools
 install_flatpak_apps
+install_tmux_plugins
 configure_fcitx5
 configure_zsh
 print_summary
