@@ -75,3 +75,11 @@ fi
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
+
+# ===============================
+# Secrets (API keys, tokens)
+# Load from ~/.secrets/ if exists
+# ===============================
+for secret_file in "$HOME/.secrets"/*; do
+  [ -f "$secret_file" ] && source "$secret_file"
+done
