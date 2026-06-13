@@ -29,15 +29,20 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # ===============================
-# Optional zsh plugins from pacman
+# Optional zsh plugins
+# Support: Arch Linux, macOS (Homebrew)
 # ===============================
-if [[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
-
-if [[ -r /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+for plugin_dir in \
+  /usr/share/zsh/plugins \
+  /opt/homebrew/share \
+  /usr/local/share; do
+  if [[ -r "$plugin_dir/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$plugin_dir/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  fi
+  if [[ -r "$plugin_dir/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$plugin_dir/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  fi
+done
 
 # ===============================
 # Useful aliases
