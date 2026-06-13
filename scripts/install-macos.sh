@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# macOS setup - installs Homebrew and all tool dependencies
+# macOS setup - installs from snapshots/
 
 set -euo pipefail
 
@@ -8,7 +8,19 @@ if [ "$(uname -s)" != "Darwin" ]; then
   exit 0
 fi
 
+DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
+SNAPSHOT_DIR="$DOTFILES_DIR/snapshots"
+
 section() { echo; echo "━━━ $1 ━━━"; }
+
+read_snapshot() {
+  local file="$SNAPSHOT_DIR/$1"
+  if [ ! -f "$file" ] || [ ! -s "$file" ]; then
+    echo "⊘ skip: snapshots/$1 not found or empty" >&2
+    return 1
+  fi
+  grep -v '^$' "$file" | grep -v '^#' || true
+}
 
 install_xcode_clt() {
   section "Xcode Command Line Tools"
@@ -40,27 +52,54 @@ install_homebrew() {
   echo "✓ installed: $(brew --prefix)"
 }
 
-install_brew_packages() {
-  section "Brew packages"
+install_brew_formulae() {
+  section "Homebrew formulae"
 
-  local formulae=(neovim git tmux fzf ripgrep lazygit stylua shfmt node rustup tree-sitter-cli)
-  local missing=()
+  local formulae_str
+  formulae_str="$(read_snapshot brew-formulae.txt)" || return 0
+
   local formula
-
-  for formula in "${formulae[@]}"; do
+  local missing=()
+  while IFS= read -r formula; do
+    [ -z "$formula" ] && continue
     if brew list --formula "$formula" >/dev/null 2>&1; then
-      echo "✓ $formula already installed"
+      echo "✓ $formula"
     else
       missing+=("$formula")
     fi
-  done
+  done <<< "$formulae_str"
 
   if [ "${#missing[@]}" -gt 0 ]; then
-    echo "→ installing: ${missing[*]}"
+    echo "→ installing ${#missing[@]} formula(e): ${missing[*]}"
     brew install "${missing[@]}"
   fi
 
-  echo "✓ brew packages ready"
+  echo "✓ brew formulae ready"
+}
+
+install_brew_casks() {
+  section "Homebrew casks"
+
+  local casks_str
+  casks_str="$(read_snapshot brew-casks.txt)" || return 0
+
+  local cask
+  local missing=()
+  while IFS= read -r cask; do
+    [ -z "$cask" ] && continue
+    if brew list --cask "$cask" >/dev/null 2>&1; then
+      echo "✓ $cask"
+    else
+      missing+=("$cask")
+    fi
+  done <<< "$casks_str"
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    echo "→ installing ${#missing[@]} cask(s): ${missing[*]}"
+    brew install --cask "${missing[@]}"
+  fi
+
+  echo "✓ brew casks ready"
 }
 
 jetbrains_nerd_font_available() {
@@ -87,7 +126,7 @@ validate_jetbrains_nerd_font() {
   return 1
 }
 
-install_nerd_font() {
+ensure_jetbrains_nerd_font() {
   section "Nerd Font (JetBrains Mono)"
 
   local cask="font-jetbrains-mono-nerd-font"
@@ -125,15 +164,29 @@ configure_terminal_app() {
   fi
 }
 
-install_prettier() {
-  section "Prettier"
-  if command -v prettier >/dev/null 2>&1; then
-    echo "✓ already installed"
-    return
+install_npm_globals() {
+  section "npm global packages"
+
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "⊘ skip: npm not available"
+    return 0
   fi
-  echo "→ installing..."
-  npm install -g prettier
-  echo "✓ installed"
+
+  local pkgs_str
+  pkgs_str="$(read_snapshot npm-global.txt)" || return 0
+
+  local pkg
+  while IFS= read -r pkg; do
+    [ -z "$pkg" ] && continue
+    if npm list -g "$pkg" >/dev/null 2>&1; then
+      echo "✓ $pkg"
+    else
+      echo "→ installing $pkg..."
+      npm install -g "$pkg"
+    fi
+  done <<< "$pkgs_str"
+
+  echo "✓ npm globals ready"
 }
 
 install_dotnet_tool() {
@@ -171,10 +224,19 @@ install_dotnet_tools() {
 
   if ! command -v dotnet >/dev/null 2>&1; then
     echo "⊘ dotnet is still unavailable; restart your shell and re-run this script"
-    return
+    return 0
   fi
 
-  install_dotnet_tool csharpier
+  local tools_str
+  tools_str="$(read_snapshot dotnet-tools.txt)" || return 0
+
+  local tool
+  while IFS= read -r tool; do
+    [ -z "$tool" ] && continue
+    install_dotnet_tool "$tool"
+  done <<< "$tools_str"
+
+  echo "✓ .NET tools ready"
 }
 
 print_summary() {
@@ -196,9 +258,10 @@ EOF
 
 install_xcode_clt
 install_homebrew
-install_brew_packages
-install_nerd_font
+install_brew_formulae
+install_brew_casks
+ensure_jetbrains_nerd_font
 configure_terminal_app
-install_prettier
+install_npm_globals
 install_dotnet_tools
 print_summary

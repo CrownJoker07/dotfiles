@@ -1,0 +1,7 @@
+cherry-studio-bin
+clash-verge-rev-bin
+feishu-bin
+microsoft-edge-stable-bin
+snipaste
+unityhub
+wechat
