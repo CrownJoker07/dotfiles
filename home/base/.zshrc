@@ -4,7 +4,7 @@
 export EDITOR=nvim
 export VISUAL=nvim
 
-# 历史记录
+# History
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
@@ -15,7 +15,7 @@ setopt hist_ignore_dups
 setopt hist_ignore_space
 setopt inc_append_history
 
-# 输入体验
+# Input
 setopt autocd
 setopt no_beep
 bindkey -e
@@ -65,7 +65,7 @@ fi
 
 # ===============================
 # Starship prompt
-# 放在最后，避免被其他 prompt 覆盖
+# Must be placed near the end
 # ===============================
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"

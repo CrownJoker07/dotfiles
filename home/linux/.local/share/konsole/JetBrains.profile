@@ -7,5 +7,9 @@ Command=/usr/bin/zsh
 Name=JetBrains
 Parent=FALLBACK/
 
+[Scrolling]
+ScrollBarPosition=1
+
 [Scrollback]
-Mode=2
+Mode=1
+LineCount=50000
