@@ -25,7 +25,11 @@ return {
     },
     opts = {
       ensure_installed = {
+        "csharpier",
+        "prettier",
         "roslyn",
+        "shfmt",
+        "stylua",
       },
     },
   },

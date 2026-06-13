@@ -44,7 +44,6 @@ pipewire-alsa
 power-profiles-daemon
 python-pynvim
 qemu-full
-rustup
 sddm
 shfmt
 snipaste

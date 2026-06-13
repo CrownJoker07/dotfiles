@@ -240,24 +240,6 @@ SDL_IM_MODULE=fcitx"
   echo "✓ fcitx5 env configured (restart session to apply)"
 }
 
-init_rustup() {
-  section "rustup"
-
-  if ! command -v rustup >/dev/null 2>&1; then
-    echo "⊘ skip: rustup not installed"
-    return 0
-  fi
-
-  if command -v rustc >/dev/null 2>&1; then
-    echo "✓ rustup already initialized: $(rustc --version)"
-    return 0
-  fi
-
-  echo "→ initializing rustup..."
-  rustup-init -y --no-modify-path
-  echo "✓ rustup initialized"
-}
-
 configure_zsh() {
   section "Default shell"
 
@@ -284,9 +266,7 @@ print_summary() {
        - Color scheme: catppuccin-mocha
        - Or use the "JetBrains" profile
 
-  3. If rustup was just initialized, restart your shell.
-
-  4. If dotnet-sdk was just installed, restart your shell then
+  3. If dotnet-sdk was just installed, restart your shell then
      re-run this script to install .NET tools.
 EOF
 }
@@ -299,6 +279,5 @@ install_npm_globals
 install_dotnet_tools
 install_flatpak_apps
 configure_fcitx5
-init_rustup
 configure_zsh
 print_summary

@@ -1,2 +1,0 @@
-csharpier
-roslyn-language-server

@@ -242,15 +242,11 @@ install_dotnet_tools() {
 print_summary() {
   section "Post-install notes"
   cat <<'EOF'
-  1. If you just installed rustup, run:
-       rustup-init -y
-     then restart your shell.
-
-  2. If you just installed dotnet-sdk, restart your shell so
+  1. If you just installed dotnet-sdk, restart your shell so
      ~/.dotnet/tools is on PATH, then re-run this script if
      csharpier was not available.
 
-  3. Roslyn language server is managed by Neovim Mason.
+  2. Roslyn language server is managed by Neovim Mason.
      Open Neovim and run :MasonInstall roslyn if it is not
      installed automatically.
 EOF

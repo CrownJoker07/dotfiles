@@ -1,0 +1,6 @@
+fzf
+git
+lazygit
+neovim
+node
+ripgrep
