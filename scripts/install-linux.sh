@@ -60,6 +60,15 @@ install_pacman_packages() {
     rustup
     tree-sitter
     dotnet-sdk
+    konsole
+    zsh
+    starship
+    eza
+    bat
+    zoxide
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+    zsh-completions
   )
 
   local missing=()
@@ -146,14 +155,36 @@ install_dotnet_tools() {
   echo "✓ csharpier installed"
 }
 
+configure_zsh() {
+  section "默认 Shell"
+
+  if [ "$(basename "$SHELL")" = "zsh" ]; then
+    echo "✓ 默认 Shell 已是 zsh"
+    return
+  fi
+
+  echo "→ 切换默认 Shell 为 zsh..."
+  chsh -s /usr/bin/zsh
+  echo "✓ 已切换 (注销重新登录后生效)"
+}
+
 print_summary() {
   section "安装后提示"
   cat <<'EOF'
-  1. 如果刚安装了 rustup，请运行：
+  1. 注销并重新登录，使以下变更生效：
+       - 默认 Shell 切换为 zsh
+       - ~/.zshrc 生效
+
+  2. 打开 Konsole，确认：
+       - 字体：JetBrainsMono Nerd Font
+       - 配色：catppuccin-mocha
+       - 或直接使用 "JetBrains" Profile
+
+  3. 如果刚安装了 rustup，请运行：
        rustup-init -y
      然后重启 shell。
 
-  2. 如果刚安装了 dotnet-sdk，请重启 shell 使
+  4. 如果刚安装了 dotnet-sdk，请重启 shell 使
      ~/.dotnet/tools 加入 PATH，然后重新运行此脚本
      以安装 csharpier。
 EOF
@@ -165,4 +196,5 @@ install_pacman_packages
 install_aur_packages
 install_prettier
 install_dotnet_tools
+configure_zsh
 print_summary
