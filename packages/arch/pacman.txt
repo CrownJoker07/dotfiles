@@ -32,15 +32,7 @@ shfmt
 stylua
 
 # ==================== 应用程序 ====================
-cherry-studio-bin
-clash-verge-rev-bin
-feishu-bin
-microsoft-edge-stable-bin
-snipaste
 steam
-unityhub
-wechat
 
 # ==================== 系统服务 ====================
 power-profiles-daemon
-yay
