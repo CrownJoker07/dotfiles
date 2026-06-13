@@ -110,6 +110,21 @@ install_nerd_font() {
   validate_jetbrains_nerd_font || true
 }
 
+configure_terminal_app() {
+  section "Terminal.app font"
+
+  if osascript -e '
+    tell application "Terminal"
+      set font name of default settings to "JetBrainsMono Nerd Font"
+      set font size of default settings to 14
+    end tell
+  ' 2>/dev/null; then
+    echo "✓ Terminal.app font set to JetBrainsMono Nerd Font 14pt"
+  else
+    echo "⊘ Terminal.app font configuration skipped (launch Terminal manually if it fails)"
+  fi
+}
+
 install_prettier() {
   section "Prettier"
   if command -v prettier >/dev/null 2>&1; then
@@ -183,6 +198,7 @@ install_xcode_clt
 install_homebrew
 install_brew_packages
 install_nerd_font
+configure_terminal_app
 install_prettier
 install_dotnet_tools
 print_summary
