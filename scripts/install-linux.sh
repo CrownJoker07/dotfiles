@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Arch Linux setup - installs from snapshots/
+# Arch Linux setup - installs from packages/
 
 set -euo pipefail
 
@@ -14,14 +14,14 @@ if [ ! -f /etc/arch-release ]; then
 fi
 
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-SNAPSHOT_DIR="$DOTFILES_DIR/snapshots"
+PACKAGE_DIR="$DOTFILES_DIR/packages"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
 read_snapshot() {
-  local file="$SNAPSHOT_DIR/$1"
+  local file="$PACKAGE_DIR/$1"
   if [ ! -f "$file" ] || [ ! -s "$file" ]; then
-    echo "⊘ skip: snapshots/$1 not found or empty" >&2
+    echo "⊘ skip: packages/$1 not found or empty" >&2
     return 1
   fi
   grep -v '^$' "$file" | grep -v '^#' || true
@@ -61,24 +61,33 @@ install_yay() {
 install_pacman_packages() {
   section "pacman packages"
 
-  local packages_str
-  packages_str="$(read_snapshot pacman.txt)" || return 0
+  local snapshot_str
+  snapshot_str="$(read_snapshot arch/pacman.txt)" || return 0
 
   local packages=()
-  local missing=()
-  local pkg
+  local entry
 
-  while IFS= read -r pkg; do
-    [ -z "$pkg" ] && continue
-    packages+=("$pkg")
-  done <<< "$packages_str"
+  while IFS= read -r entry; do
+    [ -z "$entry" ] && continue
+    packages+=("$entry")
+  done <<< "$snapshot_str"
 
-  if [ "${#packages[@]}" -eq 0 ]; then
-    echo "⊘ no packages listed"
+  local unique_packages=()
+  if [ "${#packages[@]}" -gt 0 ]; then
+    while IFS= read -r pkg; do
+      [ -n "$pkg" ] && unique_packages+=("$pkg")
+    done < <(printf '%s\n' "${packages[@]}" | sort -u)
+  fi
+
+  if [ "${#unique_packages[@]}" -eq 0 ]; then
+    echo "⊘ no packages to install"
     return 0
   fi
 
-  for pkg in "${packages[@]}"; do
+  echo "→ ${#unique_packages[@]} package(s) to check"
+
+  local missing=()
+  for pkg in "${unique_packages[@]}"; do
     if pacman -Qi "$pkg" >/dev/null 2>&1; then
       echo "✓ $pkg"
     else
@@ -91,14 +100,14 @@ install_pacman_packages() {
     sudo pacman -S --needed --noconfirm "${missing[@]}"
   fi
 
-  echo "✓ pacman packages ready (${#packages[@]} total)"
+  echo "✓ pacman packages ready (${#unique_packages[@]} total)"
 }
 
 install_aur_packages() {
   section "AUR packages (yay)"
 
   local packages_str
-  packages_str="$(read_snapshot aur.txt)" || return 0
+  packages_str="$(read_snapshot arch/aur.txt)" || return 0
 
   local packages=()
   local missing=()
@@ -139,7 +148,7 @@ install_npm_globals() {
   fi
 
   local pkgs_str
-  pkgs_str="$(read_snapshot npm-global.txt)" || return 0
+  pkgs_str="$(read_snapshot shared/npm-global.txt)" || return 0
 
   local pkg
   while IFS= read -r pkg; do
@@ -166,7 +175,7 @@ install_dotnet_tools() {
   fi
 
   local tools_str
-  tools_str="$(read_snapshot dotnet-tools.txt)" || return 0
+  tools_str="$(read_snapshot shared/dotnet-tools.txt)" || return 0
 
   local tool
   while IFS= read -r tool; do
@@ -191,7 +200,7 @@ install_flatpak_apps() {
   fi
 
   local apps_str
-  apps_str="$(read_snapshot flatpak.txt)" || return 0
+  apps_str="$(read_snapshot arch/flatpak.txt)" || return 0
 
   local app
   while IFS= read -r app; do

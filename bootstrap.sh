@@ -13,7 +13,7 @@ usage() {
   cat <<EOF
 Usage: $0 [-d] [-f] [-h]
 
-Setup a fresh machine from dotfiles snapshots.
+Setup a fresh machine from dotfiles packages.
 
   -d  Dry run (preview what would be installed)
   -f  Force overwrite existing configs
@@ -44,21 +44,21 @@ section "Pre-flight checks"
 
 echo "Dotfiles dir: $DOTFILES_DIR"
 
-if [ ! -d "$DOTFILES_DIR/snapshots" ]; then
-  echo "✗ snapshots/ directory not found"
-  echo "  Run ./scripts/snapshot.sh on your current machine first."
+if [ ! -d "$DOTFILES_DIR/packages" ]; then
+  echo "✗ packages/ directory not found"
+  echo "  Create snapshot files in packages/ first."
   exit 1
 fi
 
-snapshot_count="$(find "$DOTFILES_DIR/snapshots" -name '*.txt' -size +0c 2>/dev/null | wc -l)"
+snapshot_count="$(find "$DOTFILES_DIR/packages" -name '*.txt' -size +0c 2>/dev/null | wc -l)"
 if [ "$snapshot_count" -eq 0 ]; then
-  echo "✗ no snapshot files found in snapshots/"
-  echo "  Run ./scripts/snapshot.sh on your current machine first."
+  echo "✗ no snapshot files found in packages/"
+  echo "  Create snapshot files in packages/ first."
   exit 1
 fi
 
 echo "✓ found $snapshot_count snapshot file(s):"
-find "$DOTFILES_DIR/snapshots" -name '*.txt' -size +0c -exec basename {} \; 2>/dev/null | sort | sed 's/^/    /'
+find "$DOTFILES_DIR/packages" -name '*.txt' -size +0c -exec basename {} \; 2>/dev/null | sort | sed 's/^/    /'
 
 section "Confirm"
 
@@ -81,7 +81,7 @@ esac
 
 echo
 echo "This will:"
-echo "  1. Install all packages from snapshots/"
+echo "  1. Install all packages from packages/"
 echo "  2. Symlink config files to ~/.config and ~/"
 echo "  3. Configure system settings (shell, input method, etc.)"
 echo

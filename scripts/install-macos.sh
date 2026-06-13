@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# macOS setup - installs from snapshots/
+# macOS setup - installs from packages/
 
 set -euo pipefail
 
@@ -9,14 +9,14 @@ if [ "$(uname -s)" != "Darwin" ]; then
 fi
 
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
-SNAPSHOT_DIR="$DOTFILES_DIR/snapshots"
+PACKAGE_DIR="$DOTFILES_DIR/packages"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
 read_snapshot() {
-  local file="$SNAPSHOT_DIR/$1"
+  local file="$PACKAGE_DIR/$1"
   if [ ! -f "$file" ] || [ ! -s "$file" ]; then
-    echo "⊘ skip: snapshots/$1 not found or empty" >&2
+    echo "⊘ skip: packages/$1 not found or empty" >&2
     return 1
   fi
   grep -v '^$' "$file" | grep -v '^#' || true
@@ -56,7 +56,7 @@ install_brew_formulae() {
   section "Homebrew formulae"
 
   local formulae_str
-  formulae_str="$(read_snapshot brew-formulae.txt)" || return 0
+  formulae_str="$(read_snapshot macos/brew-formulae.txt)" || return 0
 
   local formula
   local missing=()
@@ -81,7 +81,7 @@ install_brew_casks() {
   section "Homebrew casks"
 
   local casks_str
-  casks_str="$(read_snapshot brew-casks.txt)" || return 0
+  casks_str="$(read_snapshot macos/brew-casks.txt)" || return 0
 
   local cask
   local missing=()
@@ -173,7 +173,7 @@ install_npm_globals() {
   fi
 
   local pkgs_str
-  pkgs_str="$(read_snapshot npm-global.txt)" || return 0
+  pkgs_str="$(read_snapshot shared/npm-global.txt)" || return 0
 
   local pkg
   while IFS= read -r pkg; do
@@ -228,7 +228,7 @@ install_dotnet_tools() {
   fi
 
   local tools_str
-  tools_str="$(read_snapshot dotnet-tools.txt)" || return 0
+  tools_str="$(read_snapshot shared/dotnet-tools.txt)" || return 0
 
   local tool
   while IFS= read -r tool; do
