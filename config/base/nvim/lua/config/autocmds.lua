@@ -1,6 +1,11 @@
 -- AUTOCOMMANDS
 local map = vim.keymap.set
 
+-- Autoread when file changed externally
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  command = "checktime",
+})
+
 -- Highlight when yanking
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking text",

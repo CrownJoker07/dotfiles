@@ -25,6 +25,8 @@ vim.o.splitbelow = true
 vim.o.updatetime = 250
 vim.o.timeoutlen = 500
 
+vim.o.autoread = true
+
 -- Sync clipboard between OS and Neovim
 vim.api.nvim_create_autocmd("UIEnter", {
   callback = function()
