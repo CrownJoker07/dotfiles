@@ -60,3 +60,56 @@ vim.api.nvim_create_user_command("GitBlameLine", function()
 
   print(result.stdout)
 end, { desc = "Print the git blame for the current line" })
+
+-- Auto save
+local save_group = vim.api.nvim_create_augroup("ZZWAutoSave", { clear = true })
+
+local function auto_save()
+  local buf = vim.api.nvim_get_current_buf()
+
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return
+  end
+
+  local bo = vim.bo[buf]
+
+  if not bo.modified then
+    return
+  end
+
+  if bo.buftype ~= "" then
+    return
+  end
+
+  if not bo.modifiable or bo.readonly then
+    return
+  end
+
+  if vim.api.nvim_buf_get_name(buf) == "" then
+    return
+  end
+
+  local skip_filetypes = {
+    gitcommit = true,
+    gitrebase = true,
+    lazy = true,
+    mason = true,
+    help = true,
+    qf = true,
+  }
+
+  if skip_filetypes[bo.filetype] then
+    return
+  end
+
+  vim.cmd("silent! update")
+end
+
+vim.api.nvim_create_autocmd({
+  "InsertLeave",
+  "BufLeave",
+  "FocusLost",
+}, {
+  group = save_group,
+  callback = auto_save,
+})
