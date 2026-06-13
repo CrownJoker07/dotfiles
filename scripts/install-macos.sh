@@ -242,24 +242,21 @@ install_dotnet_tools() {
 install_tmux_plugins() {
   section "tmux plugins"
 
-  local tpm_dir="$HOME/.tmux/plugins/tpm"
+  local brew_prefix
+  brew_prefix="$(brew --prefix)"
+  local tpm_path="$brew_prefix/share/tpm"
 
-  if [ -d "$tpm_dir" ] && [ -f "$tpm_dir/tpm" ]; then
-    echo "✓ tpm already installed"
-  else
-    echo "→ installing tpm..."
-    mkdir -p "$tpm_dir"
-    git clone https://github.com/tmux-plugins/tpm.git "$tpm_dir"
-
-    if [ ! -f "$tpm_dir/tpm" ]; then
-      echo "✗ tpm install failed"
-      return 1
-    fi
-    echo "✓ tpm installed"
+  if [ ! -f "$tpm_path/tpm" ] && [ -f "$HOME/.tmux/plugins/tpm/tpm" ]; then
+    tpm_path="$HOME/.tmux/plugins/tpm"
   fi
 
-  echo "→ installing plugins via tpm..."
-  "$tpm_dir/bin/install_plugins"
+  if [ ! -f "$tpm_path/tpm" ]; then
+    echo "✗ tpm not found (install tpm via Homebrew)"
+    return 1
+  fi
+
+  echo "→ installing plugins via tpm ($tpm_path)..."
+  "$tpm_path/bin/install_plugins"
   echo "✓ tmux plugins installed"
 }
 

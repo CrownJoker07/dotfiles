@@ -256,24 +256,23 @@ configure_zsh() {
 install_tmux_plugins() {
   section "tmux plugins"
 
-  local tpm_dir="$HOME/.tmux/plugins/tpm"
+  local tpm_path=""
+  [ -f /usr/share/tmux-plugin-manager/tpm ] && tpm_path="/usr/share/tmux-plugin-manager"
+  [ -z "$tpm_path" ] && [ -f "$HOME/.tmux/plugins/tpm/tpm" ] && tpm_path="$HOME/.tmux/plugins/tpm"
 
-  if [ -d "$tpm_dir" ] && [ -f "$tpm_dir/tpm" ]; then
-    echo "✓ tpm already installed"
-  else
-    echo "→ installing tpm..."
-    mkdir -p "$tpm_dir"
-    git clone https://github.com/tmux-plugins/tpm.git "$tpm_dir"
-
-    if [ ! -f "$tpm_dir/tpm" ]; then
-      echo "✗ tpm install failed"
-      return 1
-    fi
-    echo "✓ tpm installed"
+  if [ -z "$tpm_path" ]; then
+    echo "✗ tpm not found (install tmux-plugin-manager via AUR)"
+    return 1
   fi
 
-  echo "→ installing plugins via tpm..."
-  "$tpm_dir/bin/install_plugins"
+  echo "→ installing plugins via tpm ($tpm_path)..."
+  local session_name="_tpm_install_$$"
+  tmux start-server
+  tmux new-session -d -s "$session_name" 2>/dev/null || true
+  tmux source-file "$HOME/.tmux.conf" 2>/dev/null || true
+  export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins/"
+  "$tpm_path/bin/install_plugins"
+  tmux kill-session -t "$session_name" 2>/dev/null || true
   echo "✓ tmux plugins installed"
 }
 

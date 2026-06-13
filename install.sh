@@ -18,6 +18,8 @@ echo "Dotfiles dir: $DOTFILES_DIR"
 echo "Config dir:   $XDG_CONFIG_DIR"
 echo
 
+"$DOTFILES_DIR/scripts/symlink.sh" "$@"
+
 if [ "$DRY_RUN" = true ]; then
   echo "⊘ dry-run: skip package installers"
 else
@@ -27,8 +29,6 @@ else
     *) echo "⊘ skip package installers: unsupported OS $(uname -s)" ;;
   esac
 fi
-
-"$DOTFILES_DIR/scripts/symlink.sh" "$@"
 
 echo
 echo "Done."
