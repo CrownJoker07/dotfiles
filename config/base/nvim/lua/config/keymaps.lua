@@ -25,3 +25,14 @@ map("n", "<leader>gg", function()
   vim.cmd("terminal lazygit")
   vim.cmd("startinsert")
 end, { desc = "Open Lazygit" })
+
+-- Open git remote repository
+map("n", "<leader>go", function()
+  local url = vim.fn.system("git remote get-url origin"):gsub("%s+", "")
+  if url == "" or vim.v.shell_error ~= 0 then
+    vim.notify("No git remote found", vim.log.levels.ERROR)
+    return
+  end
+  url = url:gsub("^git@([^:]+):", "https://%1/"):gsub("%.git$", "")
+  vim.ui.open(url)
+end, { desc = "Open Git remote repository" })
