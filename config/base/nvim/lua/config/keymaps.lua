@@ -36,3 +36,8 @@ map("n", "<leader>go", function()
   url = url:gsub("^git@([^:]+):", "https://%1/"):gsub("%.git$", "")
   vim.ui.open(url)
 end, { desc = "Open Git remote repository" })
+
+-- Open image with system viewer
+map("n", "<leader>oi", function()
+  vim.fn.jobstart({ "xdg-open", vim.fn.expand("%:p") }, { detach = true })
+end, { desc = "Open image with system viewer" })
