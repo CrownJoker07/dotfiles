@@ -77,6 +77,13 @@ if command -v starship >/dev/null 2>&1; then
 fi
 
 # ===============================
+# Auto start tmux (local sessions only)
+# ===============================
+if [[ -z "$TMUX" && -n "$PS1" && -z "$SSH_CONNECTION" ]]; then
+  tmux new -A -s main
+fi
+
+# ===============================
 # Secrets (API keys, tokens)
 # Load from ~/.secrets/ if exists
 # ===============================
