@@ -53,7 +53,7 @@ return {
       "saghen/blink.cmp",
     },
     opts = {
-      broad_search = true,
+      broad_search = false,
     },
     config = function(_, opts)
       vim.lsp.config("roslyn", {
