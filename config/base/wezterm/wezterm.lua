@@ -4,7 +4,11 @@ local is_mac = wezterm.target_triple:find("darwin") ~= nil
 
 -- ==================== Font ====================
 config.font = wezterm.font("JetBrainsMono Nerd Font")
-config.font_size = 12.0
+if is_mac then
+	config.font_size = 14.0
+else
+	config.font_size = 12.0
+end
 
 -- ==================== Catppuccin Mocha ====================
 local c = {
