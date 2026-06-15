@@ -241,7 +241,14 @@ install_tmux_plugins() {
   fi
 
   echo "→ installing plugins via tpm ($tpm_path)..."
+  local session_name="_tpm_install_$$"
+  tmux start-server
+  tmux new-session -d -s "$session_name" 2>/dev/null || true
+  tmux source-file "$HOME/.tmux.conf" 2>/dev/null || true
+  export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins/"
+  tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGIN_MANAGER_PATH"
   "$tpm_path/bin/install_plugins"
+  tmux kill-session -t "$session_name" 2>/dev/null || true
   echo "✓ tmux plugins installed"
 }
 
