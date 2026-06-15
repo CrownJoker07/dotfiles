@@ -284,10 +284,8 @@ print_summary() {
        - ~/.zshrc to take effect
        - fcitx5 environment variables
 
-  2. Open Konsole → verify:
-       - Font: JetBrainsMono Nerd Font
-       - Color scheme: catppuccin-mocha
-       - Or use the "JetBrains" profile
+  2. WezTerm is configured via ~/.config/wezterm/wezterm.lua
+     (symlinked from dotfiles). Restart WezTerm if already open.
 
   3. If dotnet-sdk was just installed, restart your shell then
      re-run this script to install .NET tools.

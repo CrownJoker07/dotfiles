@@ -149,21 +149,6 @@ ensure_jetbrains_nerd_font() {
   validate_jetbrains_nerd_font || true
 }
 
-configure_terminal_app() {
-  section "Terminal.app font"
-
-  if osascript -e '
-    tell application "Terminal"
-      set font name of default settings to "JetBrainsMono Nerd Font"
-      set font size of default settings to 14
-    end tell
-  ' 2>/dev/null; then
-    echo "✓ Terminal.app font set to JetBrainsMono Nerd Font 14pt"
-  else
-    echo "⊘ Terminal.app font configuration skipped (launch Terminal manually if it fails)"
-  fi
-}
-
 install_npm_globals() {
   section "npm global packages"
 
@@ -278,7 +263,6 @@ install_homebrew
 install_brew_formulae
 install_brew_casks
 ensure_jetbrains_nerd_font
-configure_terminal_app
 install_npm_globals
 install_dotnet_tools
 install_tmux_plugins
