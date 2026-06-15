@@ -45,6 +45,38 @@ return {
     },
   },
 
+  -- Smooth scrolling
+  {
+    "karb94/neoscroll.nvim",
+    event = "VeryLazy",
+    opts = {
+      mappings = { "<C-u>", "<C-d>", "<C-b>", "<C-f>", "<C-y>", "<C-e>", "zt", "zz", "zb" },
+      hide_cursor = true,
+      stop_eof = true,
+      respect_scrolloff = true,
+      cursor_scrolls_alone = true,
+      duration_multiplier = 0.8,
+      easing = "sine",
+      pre_hook = function()
+        vim.opt.cursorline = false
+      end,
+      post_hook = function()
+        vim.opt.cursorline = true
+      end,
+    },
+    keys = {
+      { "<C-u>", function() require("neoscroll").ctrl_u({ duration = 200 }) end, mode = { "n", "v", "x" } },
+      { "<C-d>", function() require("neoscroll").ctrl_d({ duration = 200 }) end, mode = { "n", "v", "x" } },
+      { "<C-b>", function() require("neoscroll").ctrl_b({ duration = 400 }) end, mode = { "n", "v", "x" } },
+      { "<C-f>", function() require("neoscroll").ctrl_f({ duration = 400 }) end, mode = { "n", "v", "x" } },
+      { "<C-y>", function() require("neoscroll").scroll(-0.1, { move_cursor = false, duration = 80 }) end, mode = { "n", "v", "x" } },
+      { "<C-e>", function() require("neoscroll").scroll(0.1, { move_cursor = false, duration = 80 }) end, mode = { "n", "v", "x" } },
+      { "zt", function() require("neoscroll").zt({ half_win_duration = 200 }) end, mode = { "n", "v", "x" } },
+      { "zz", function() require("neoscroll").zz({ half_win_duration = 200 }) end, mode = { "n", "v", "x" } },
+      { "zb", function() require("neoscroll").zb({ half_win_duration = 200 }) end, mode = { "n", "v", "x" } },
+    },
+  },
+
   -- Better diagnostics / references / quickfix UI
   {
     "folke/trouble.nvim",
