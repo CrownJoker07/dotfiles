@@ -27,9 +27,6 @@ nodejs
 npm
 opencode
 python-pynvim
-tree-sitter-cli
-shfmt
-stylua
 
 # ==================== 应用程序 ====================
 steam

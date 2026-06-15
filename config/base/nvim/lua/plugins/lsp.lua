@@ -30,6 +30,7 @@ return {
         "roslyn",
         "shfmt",
         "stylua",
+        "tree-sitter-cli",
       },
     },
   },
