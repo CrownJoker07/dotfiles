@@ -1,0 +1,58 @@
+# Agent Guide
+
+This repository is a cross-platform dotfiles setup for macOS and Arch Linux.
+Keep the two systems as close as practical while respecting platform-specific
+package names, paths, and desktop behavior.
+
+## Repository Layout
+
+- `config/base/`: XDG config shared by macOS and Linux.
+- `home/base/`: home-directory dotfiles shared by macOS and Linux.
+- `config/macos/` and `home/macos/`: macOS-only overrides.
+- `config/linux/` and `home/linux/`: Linux-only overrides.
+- `packages/macos/`: Homebrew formula and cask snapshots.
+- `packages/arch/`: Arch pacman, archlinuxcn, and AUR package snapshots.
+- `scripts/`: installer and symlink logic.
+
+## Cross-Platform Rules
+
+- Prefer changing `base` files first. Add platform-specific files only when the
+  behavior truly differs between macOS and Linux.
+- Preserve the installer flow: `install.sh` symlinks config first, then runs the
+  platform package installer unless `-d` is used.
+- Keep package lists aligned by capability, not necessarily by exact package
+  name. For example, Homebrew `node` corresponds to Arch `nodejs`/`npm`.
+- Do not add unrelated refactors or style churn while changing dotfiles.
+
+## Package Management Rules
+
+- Do not add repository scripts that build system software from source.
+- Do not use `makepkg`, `cargo install`, `go install`, `pip install`, or manual
+  `git clone` build flows for system dependencies.
+- Prefer package-managed binary installs: Homebrew on macOS, official `pacman`
+  repositories on Arch, and the configured `archlinuxcn` binary repository for
+  packages that are not in official Arch repositories.
+- AUR packages are allowed only through an already installed AUR helper such as
+  `paru` or `yay`. This repository must not build the helper itself; install
+  `yay` through `archlinuxcn` when possible.
+- Do not add Flatpak support to the Linux installer. Prefer `pacman`,
+  `archlinuxcn`, then AUR helper packages.
+- Homebrew formula installs should use bottles and avoid source fallback.
+- Neovim plugins and editor tools are managed by `lazy.nvim` and Mason. Do not
+  duplicate Mason-managed LSP servers, formatters, or parser tooling in system
+  package lists unless there is a clear reason. This includes `tree-sitter-cli`,
+  `shfmt`, and `stylua`.
+- tmux plugins are managed by TPM. The TPM executable itself should come from a
+  package manager when possible.
+
+## Validation
+
+Run these checks after modifying installer scripts or package lists:
+
+```sh
+bash -n install.sh scripts/install-linux.sh scripts/install-macos.sh scripts/symlink.sh
+! rg -n "makepkg|git clone https://aur.archlinux.org|base-devel|build-from-source|cargo install|go install|pip install|flatpak" scripts packages
+./install.sh -d
+```
+
+The dry run should only report symlink actions and must not install packages.
