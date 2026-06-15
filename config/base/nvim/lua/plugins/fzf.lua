@@ -16,6 +16,15 @@ return {
     },
     opts = {
       fzf_colors = true,
+      winopts = {
+        fullscreen = true,
+        preview = {
+          hidden = true,
+        },
+      },
+      defaults = {
+        formatter = "path.filename_first",
+      },
     },
   },
 }
