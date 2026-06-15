@@ -1,14 +1,27 @@
-# ==================== 命令行工具 ====================
-fzf
-ripgrep
-tpm
+# ==================== Shell ====================
+zsh-autosuggestions
+zsh-completions
+zsh-syntax-highlighting
 
 # ==================== 编辑器 ====================
 neovim
 
+# ==================== 命令行工具 ====================
+bat
+eza
+fastfetch
+fd
+fzf
+man-db
+ripgrep
+starship
+tmux
+tpm
+unzip
+zoxide
+
 # ==================== 开发工具 ====================
-# 版本控制
 git
 lazygit
-# 运行时
 node
+opencode

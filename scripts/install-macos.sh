@@ -70,8 +70,8 @@ install_brew_formulae() {
   done <<< "$formulae_str"
 
   if [ "${#missing[@]}" -gt 0 ]; then
-    echo "→ installing ${#missing[@]} formula(e): ${missing[*]}"
-    brew install "${missing[@]}"
+    echo "→ installing ${#missing[@]} formula(e) from bottles: ${missing[*]}"
+    brew install --force-bottle "${missing[@]}"
   fi
 
   echo "✓ brew formulae ready"
@@ -149,81 +149,6 @@ ensure_jetbrains_nerd_font() {
   validate_jetbrains_nerd_font || true
 }
 
-install_npm_globals() {
-  section "npm global packages"
-
-  if ! command -v npm >/dev/null 2>&1; then
-    echo "⊘ skip: npm not available"
-    return 0
-  fi
-
-  local pkgs_str
-  pkgs_str="$(read_snapshot shared/npm-global.txt)" || return 0
-
-  local pkg
-  while IFS= read -r pkg; do
-    [ -z "$pkg" ] && continue
-    if npm list -g "$pkg" >/dev/null 2>&1; then
-      echo "✓ $pkg"
-    else
-      echo "→ installing $pkg..."
-      npm install -g "$pkg"
-    fi
-  done <<< "$pkgs_str"
-
-  echo "✓ npm globals ready"
-}
-
-install_dotnet_tool() {
-  local tool="$1"
-
-  if command -v "$tool" >/dev/null 2>&1; then
-    echo "✓ $tool already installed"
-    return
-  fi
-
-  echo "→ installing $tool..."
-  if dotnet tool install -g "$tool"; then
-    echo "✓ $tool installed"
-  else
-    echo "⊘ $tool install failed (check network, NuGet access, or ~/.dotnet/tools PATH)"
-  fi
-}
-
-install_dotnet_tools() {
-  section ".NET SDK + tools"
-
-  export PATH="$HOME/.dotnet/tools:$PATH"
-
-  if ! command -v dotnet >/dev/null 2>&1; then
-    if brew list --cask dotnet-sdk >/dev/null 2>&1; then
-      echo "⊘ dotnet-sdk cask installed but not on PATH; restart your shell first"
-    else
-      echo "→ installing dotnet-sdk..."
-      brew install --cask dotnet-sdk
-      echo "✓ dotnet-sdk installed"
-    fi
-  else
-    echo "✓ dotnet already available"
-  fi
-
-  if ! command -v dotnet >/dev/null 2>&1; then
-    echo "⊘ dotnet is still unavailable; restart your shell and re-run this script"
-    return 0
-  fi
-
-  local tools_str
-  tools_str="$(read_snapshot shared/dotnet-tools.txt)" || return 0
-
-  local tool
-  while IFS= read -r tool; do
-    [ -z "$tool" ] && continue
-    install_dotnet_tool "$tool"
-  done <<< "$tools_str"
-
-  echo "✓ .NET tools ready"
-}
-
 install_tmux_plugins() {
   section "tmux plugins"
 
@@ -255,11 +180,7 @@ install_tmux_plugins() {
 print_summary() {
   section "Post-install notes"
   cat <<'EOF'
-  1. If you just installed dotnet-sdk, restart your shell so
-     ~/.dotnet/tools is on PATH, then re-run this script if
-     csharpier was not available.
-
-  2. Roslyn language server is managed by Neovim Mason.
+  1. Roslyn language server is managed by Neovim Mason.
      Open Neovim and run :MasonInstall roslyn if it is not
      installed automatically.
 EOF
@@ -270,7 +191,5 @@ install_homebrew
 install_brew_formulae
 install_brew_casks
 ensure_jetbrains_nerd_font
-install_npm_globals
-install_dotnet_tools
 install_tmux_plugins
 print_summary

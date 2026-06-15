@@ -28,34 +28,27 @@ read_snapshot() {
 }
 
 install_base_deps() {
-  section "Base deps (git, base-devel)"
-  sudo pacman -S --needed --noconfirm git base-devel
+  section "Base deps (git)"
+  sudo pacman -S --needed --noconfirm git
   echo "✓ base deps ready"
 }
 
-install_yay() {
-  section "yay (AUR helper)"
-  if command -v yay >/dev/null 2>&1; then
-    echo "✓ already installed: $(yay --version | head -1)"
-    return
-  fi
+ensure_archlinuxcn_repo() {
+  section "archlinuxcn repository"
 
-  echo "→ building from AUR..."
-  local tmpdir
-  tmpdir="$(mktemp -d)"
-  git clone https://aur.archlinux.org/yay.git "$tmpdir/yay"
-  (
-    cd "$tmpdir/yay"
-    makepkg -si --noconfirm
-  )
-  rm -rf "$tmpdir"
+  local pacman_conf="/etc/pacman.conf"
 
-  if command -v yay >/dev/null 2>&1; then
-    echo "✓ yay installed"
+  if grep -Eq '^\[archlinuxcn\]' "$pacman_conf"; then
+    echo "✓ already configured"
   else
-    echo "✗ yay install failed"
-    exit 1
+    echo "→ enabling archlinuxcn in $pacman_conf..."
+    printf '\n# dotfiles: archlinuxcn repository\n[archlinuxcn]\nServer = https://repo.archlinuxcn.org/$arch\n' | sudo tee -a "$pacman_conf" >/dev/null
+    echo "✓ repository added"
   fi
+
+  echo "→ installing archlinuxcn keyring..."
+  sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
+  echo "✓ archlinuxcn ready"
 }
 
 install_pacman_packages() {
@@ -103,11 +96,55 @@ install_pacman_packages() {
   echo "✓ pacman packages ready (${#unique_packages[@]} total)"
 }
 
+install_archlinuxcn_packages() {
+  section "archlinuxcn packages"
+
+  local snapshot_str
+  snapshot_str="$(read_snapshot arch/archlinuxcn.txt)" || return 0
+
+  local packages=()
+  local entry
+
+  while IFS= read -r entry; do
+    [ -z "$entry" ] && continue
+    packages+=("$entry")
+  done <<< "$snapshot_str"
+
+  if [ "${#packages[@]}" -eq 0 ]; then
+    echo "⊘ no archlinuxcn packages to install"
+    return 0
+  fi
+
+  local missing=()
+  local pkg
+  for pkg in "${packages[@]}"; do
+    if pacman -Qi "$pkg" >/dev/null 2>&1; then
+      echo "✓ $pkg"
+    else
+      missing+=("$pkg")
+    fi
+  done
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    echo "→ installing ${#missing[@]} archlinuxcn package(s): ${missing[*]}"
+    sudo pacman -S --needed --noconfirm "${missing[@]}"
+  fi
+
+  echo "✓ archlinuxcn packages ready (${#packages[@]} total)"
+}
+
 install_aur_packages() {
-  section "AUR packages (yay)"
+  section "AUR packages"
 
   local packages_str
   packages_str="$(read_snapshot arch/aur.txt)" || return 0
+
+  local aur_helper=""
+  if command -v paru >/dev/null 2>&1; then
+    aur_helper="paru"
+  elif command -v yay >/dev/null 2>&1; then
+    aur_helper="yay"
+  fi
 
   local packages=()
   local missing=()
@@ -123,8 +160,17 @@ install_aur_packages() {
     return 0
   fi
 
+  if [ -z "$aur_helper" ]; then
+    echo "⊘ skip: AUR packages listed, but no AUR helper found"
+    echo "  Install paru or yay through a package-managed path you trust, then re-run this script."
+    echo "  This repository does not build AUR helpers from source."
+    return 0
+  fi
+
+  echo "→ using AUR helper: $aur_helper"
+
   for pkg in "${packages[@]}"; do
-    if yay -Qi "$pkg" >/dev/null 2>&1; then
+    if "$aur_helper" -Qi "$pkg" >/dev/null 2>&1; then
       echo "✓ $pkg"
     else
       missing+=("$pkg")
@@ -133,87 +179,10 @@ install_aur_packages() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} AUR package(s): ${missing[*]}"
-    yay -S --needed --noconfirm "${missing[@]}"
+    "$aur_helper" -S --needed --noconfirm "${missing[@]}"
   fi
 
   echo "✓ AUR packages ready (${#packages[@]} total)"
-}
-
-install_npm_globals() {
-  section "npm global packages"
-
-  if ! command -v npm >/dev/null 2>&1; then
-    echo "⊘ skip: npm not available"
-    return 0
-  fi
-
-  local pkgs_str
-  pkgs_str="$(read_snapshot shared/npm-global.txt)" || return 0
-
-  local pkg
-  while IFS= read -r pkg; do
-    [ -z "$pkg" ] && continue
-    if npm list -g "$pkg" >/dev/null 2>&1; then
-      echo "✓ $pkg"
-    else
-      echo "→ installing $pkg..."
-      npm install -g "$pkg"
-    fi
-  done <<< "$pkgs_str"
-
-  echo "✓ npm globals ready"
-}
-
-install_dotnet_tools() {
-  section ".NET global tools"
-
-  export PATH="$HOME/.dotnet/tools:$PATH"
-
-  if ! command -v dotnet >/dev/null 2>&1; then
-    echo "⊘ skip: dotnet not available (restart shell if just installed)"
-    return 0
-  fi
-
-  local tools_str
-  tools_str="$(read_snapshot shared/dotnet-tools.txt)" || return 0
-
-  local tool
-  while IFS= read -r tool; do
-    [ -z "$tool" ] && continue
-    if command -v "$tool" >/dev/null 2>&1; then
-      echo "✓ $tool"
-    else
-      echo "→ installing $tool..."
-      dotnet tool install -g "$tool" || echo "⊘ $tool install failed"
-    fi
-  done <<< "$tools_str"
-
-  echo "✓ .NET tools ready"
-}
-
-install_flatpak_apps() {
-  section "Flatpak apps"
-
-  if ! command -v flatpak >/dev/null 2>&1; then
-    echo "⊘ skip: flatpak not installed"
-    return 0
-  fi
-
-  local apps_str
-  apps_str="$(read_snapshot arch/flatpak.txt)" || return 0
-
-  local app
-  while IFS= read -r app; do
-    [ -z "$app" ] && continue
-    if flatpak info "$app" >/dev/null 2>&1; then
-      echo "✓ $app"
-    else
-      echo "→ installing $app..."
-      flatpak install -y flathub "$app" || echo "⊘ $app install failed"
-    fi
-  done <<< "$apps_str"
-
-  echo "✓ flatpak apps ready"
 }
 
 configure_fcitx5() {
@@ -261,8 +230,8 @@ install_tmux_plugins() {
   [ -z "$tpm_path" ] && [ -f "$HOME/.tmux/plugins/tpm/tpm" ] && tpm_path="$HOME/.tmux/plugins/tpm"
 
   if [ -z "$tpm_path" ]; then
-    echo "✗ tpm not found (install tmux-plugin-manager via AUR)"
-    return 1
+    echo "⊘ skip: tpm not found (install tmux-plugin-manager through paru/yay, then re-run)"
+    return 0
   fi
 
   echo "→ installing plugins via tpm ($tpm_path)..."
@@ -286,19 +255,14 @@ print_summary() {
 
   2. WezTerm is configured via ~/.config/wezterm/wezterm.lua
      (symlinked from dotfiles). Restart WezTerm if already open.
-
-  3. If dotnet-sdk was just installed, restart your shell then
-     re-run this script to install .NET tools.
 EOF
 }
 
 install_base_deps
-install_yay
+ensure_archlinuxcn_repo
+install_archlinuxcn_packages
 install_pacman_packages
 install_aur_packages
-install_npm_globals
-install_dotnet_tools
-install_flatpak_apps
 install_tmux_plugins
 configure_fcitx5
 configure_zsh
