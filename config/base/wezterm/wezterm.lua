@@ -109,4 +109,9 @@ end
 config.adjust_window_size_when_changing_font_size = false
 config.audible_bell = "Disabled"
 
+wezterm.on("gui-startup", function(cmd)
+  local _, _, window = wezterm.mux.spawn_window(cmd or {})
+  window:gui_window():maximize()
+end)
+
 return config
