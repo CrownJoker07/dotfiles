@@ -87,6 +87,8 @@ fi
 # Secrets (API keys, tokens)
 # Load from ~/.secrets/ if exists
 # ===============================
-for secret_file in "$HOME/.secrets"/*; do
-  [ -f "$secret_file" ] && source "$secret_file"
-done
+if [[ -d "$HOME/.secrets" ]]; then
+  for secret_file in "$HOME/.secrets"/*(N); do
+    [[ -f "$secret_file" ]] && source "$secret_file"
+  done
+fi
