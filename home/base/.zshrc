@@ -79,7 +79,7 @@ fi
 # ===============================
 # Auto start tmux (local sessions only)
 # ===============================
-if [[ -z "$TMUX" && -n "$PS1" && -z "$SSH_CONNECTION" ]]; then
+if [[ -z "$TMUX" && -n "$PS1" && -z "$SSH_CONNECTION" && "$TERM_PROGRAM" == "WezTerm" ]]; then
   tmux new -A -s main
 fi
 
