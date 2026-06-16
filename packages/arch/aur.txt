@@ -7,7 +7,6 @@ wechat
 microsoft-edge-stable-bin
 # 工具
 clash-verge-rev-bin
-openai-codex-bin
 snipaste
 tmux-plugin-manager
 # 游戏

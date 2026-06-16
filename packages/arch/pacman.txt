@@ -24,6 +24,7 @@ zoxide
 lazygit
 nodejs
 npm
+openai-codex
 opencode
 python-pynvim
 
