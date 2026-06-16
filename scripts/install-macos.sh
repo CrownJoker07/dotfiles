@@ -13,7 +13,7 @@ PACKAGE_DIR="$DOTFILES_DIR/packages"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
-read_snapshot() {
+read_package_list() {
   local file="$PACKAGE_DIR/$1"
   if [ ! -f "$file" ] || [ ! -s "$file" ]; then
     echo "⊘ skip: packages/$1 not found or empty" >&2
@@ -55,8 +55,8 @@ install_homebrew() {
 install_brew_formulae() {
   section "Homebrew formulae"
 
-  local formulae_str
-  formulae_str="$(read_snapshot macos/brew-formulae.txt)" || return 0
+  local formula_list
+  formula_list="$(read_package_list macos/brew-formulae.txt)" || return 0
 
   local formula
   local missing=()
@@ -67,7 +67,7 @@ install_brew_formulae() {
     else
       missing+=("$formula")
     fi
-  done <<< "$formulae_str"
+  done <<< "$formula_list"
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} formula(e) from bottles: ${missing[*]}"
@@ -80,8 +80,8 @@ install_brew_formulae() {
 install_brew_casks() {
   section "Homebrew casks"
 
-  local casks_str
-  casks_str="$(read_snapshot macos/brew-casks.txt)" || return 0
+  local cask_list
+  cask_list="$(read_package_list macos/brew-casks.txt)" || return 0
 
   local cask
   local missing=()
@@ -92,7 +92,7 @@ install_brew_casks() {
     else
       missing+=("$cask")
     fi
-  done <<< "$casks_str"
+  done <<< "$cask_list"
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} cask(s): ${missing[*]}"

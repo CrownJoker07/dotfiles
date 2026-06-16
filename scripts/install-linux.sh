@@ -18,7 +18,7 @@ PACKAGE_DIR="$DOTFILES_DIR/packages"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
-read_snapshot() {
+read_package_list() {
   local file="$PACKAGE_DIR/$1"
   if [ ! -f "$file" ] || [ ! -s "$file" ]; then
     echo "⊘ skip: packages/$1 not found or empty" >&2
@@ -54,8 +54,8 @@ ensure_archlinuxcn_repo() {
 install_pacman_packages() {
   section "pacman packages"
 
-  local snapshot_str
-  snapshot_str="$(read_snapshot arch/pacman.txt)" || return 0
+  local packages_str
+  packages_str="$(read_package_list arch/pacman.txt)" || return 0
 
   local packages=()
   local entry
@@ -63,24 +63,23 @@ install_pacman_packages() {
   while IFS= read -r entry; do
     [ -z "$entry" ] && continue
     packages+=("$entry")
-  done <<< "$snapshot_str"
+  done <<< "$packages_str"
 
-  local unique_packages=()
   if [ "${#packages[@]}" -gt 0 ]; then
     while IFS= read -r pkg; do
-      [ -n "$pkg" ] && unique_packages+=("$pkg")
+      [ -n "$pkg" ] && packages+=("$pkg")
     done < <(printf '%s\n' "${packages[@]}" | sort -u)
   fi
 
-  if [ "${#unique_packages[@]}" -eq 0 ]; then
+  if [ "${#packages[@]}" -eq 0 ]; then
     echo "⊘ no packages to install"
     return 0
   fi
 
-  echo "→ ${#unique_packages[@]} package(s) to check"
+  echo "→ ${#packages[@]} package(s) to check"
 
   local missing=()
-  for pkg in "${unique_packages[@]}"; do
+  for pkg in "${packages[@]}"; do
     if pacman -Qi "$pkg" >/dev/null 2>&1; then
       echo "✓ $pkg"
     else
@@ -93,14 +92,14 @@ install_pacman_packages() {
     sudo pacman -S --needed --noconfirm "${missing[@]}"
   fi
 
-  echo "✓ pacman packages ready (${#unique_packages[@]} total)"
+  echo "✓ pacman packages ready (${#packages[@]} total)"
 }
 
 install_archlinuxcn_packages() {
   section "archlinuxcn packages"
 
-  local snapshot_str
-  snapshot_str="$(read_snapshot arch/archlinuxcn.txt)" || return 0
+  local packages_str
+  packages_str="$(read_package_list arch/archlinuxcn.txt)" || return 0
 
   local packages=()
   local entry
@@ -108,7 +107,7 @@ install_archlinuxcn_packages() {
   while IFS= read -r entry; do
     [ -z "$entry" ] && continue
     packages+=("$entry")
-  done <<< "$snapshot_str"
+  done <<< "$packages_str"
 
   if [ "${#packages[@]}" -eq 0 ]; then
     echo "⊘ no archlinuxcn packages to install"
@@ -137,7 +136,7 @@ install_aur_packages() {
   section "AUR packages"
 
   local packages_str
-  packages_str="$(read_snapshot arch/aur.txt)" || return 0
+  packages_str="$(read_package_list arch/aur.txt)" || return 0
 
   local aur_helper=""
   if command -v paru >/dev/null 2>&1; then
