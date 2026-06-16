@@ -53,7 +53,7 @@ package names, paths, and desktop behavior.
 Run these checks after modifying installer scripts or package lists:
 
 ```sh
-bash -n install.sh scripts/install-linux.sh scripts/install-macos.sh scripts/symlink.sh
+bash -n install.sh scripts/install-arch.sh scripts/install-macos.sh scripts/symlink.sh
 ! rg -n "makepkg|git clone https://aur.archlinux.org|base-devel|build-from-source|cargo install|go install|pip install|flatpak" scripts packages
 ./install.sh -d
 ```

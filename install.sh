@@ -25,7 +25,7 @@ if [ "$DRY_RUN" = true ]; then
 else
   case "$(uname -s)" in
     Darwin) "$DOTFILES_DIR/scripts/install-macos.sh" ;;
-    Linux) "$DOTFILES_DIR/scripts/install-linux.sh" ;;
+    Linux) "$DOTFILES_DIR/scripts/install-arch.sh" ;;
     *) echo "⊘ skip package installers: unsupported OS $(uname -s)" ;;
   esac
 fi
