@@ -185,30 +185,6 @@ install_aur_packages() {
   echo "✓ AUR packages ready (${#packages[@]} total)"
 }
 
-configure_fcitx5() {
-  section "fcitx5 input method"
-
-  if ! pacman -Qi fcitx5 >/dev/null 2>&1; then
-    echo "⊘ skip: fcitx5 not installed"
-    return 0
-  fi
-
-  local env_file="/etc/environment.d/fcitx5.conf"
-  local env_content="GTK_IM_MODULE=fcitx
-QT_IM_MODULE=fcitx
-XMODIFIERS=@im=fcitx
-SDL_IM_MODULE=fcitx"
-
-  if [ -f "$env_file" ] && grep -q "GTK_IM_MODULE=fcitx" "$env_file"; then
-    echo "✓ fcitx5 env already configured"
-    return 0
-  fi
-
-  echo "→ writing $env_file..."
-  echo "$env_content" | sudo tee "$env_file" >/dev/null
-  echo "✓ fcitx5 env configured (restart session to apply)"
-}
-
 configure_zsh() {
   section "Default shell"
 
@@ -251,7 +227,6 @@ print_summary() {
   1. Restart session / log out & back in for:
        - Default shell → zsh
        - ~/.zshrc to take effect
-       - fcitx5 environment variables
 
   2. WezTerm is configured via ~/.config/wezterm/wezterm.lua
      (symlinked from dotfiles). Restart WezTerm if already open.
@@ -264,6 +239,5 @@ install_archlinuxcn_packages
 install_pacman_packages
 install_aur_packages
 install_tmux_plugins
-configure_fcitx5
 configure_zsh
 print_summary
