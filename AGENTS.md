@@ -37,6 +37,9 @@ package names, paths, and desktop behavior.
   `yay` through `archlinuxcn` when possible.
 - Do not add Flatpak support to the Linux installer. Prefer `pacman`,
   `archlinuxcn`, then AUR helper packages.
+- Before adding a package to `aur.txt`, verify it is not already available
+  in the official `pacman` or `archlinuxcn` repositories. Use the pacman
+  equivalent when available.
 - Homebrew formula installs should use bottles and avoid source fallback.
 - Neovim plugins and editor tools are managed by `lazy.nvim` and Mason. Do not
   duplicate Mason-managed LSP servers, formatters, or parser tooling in system
