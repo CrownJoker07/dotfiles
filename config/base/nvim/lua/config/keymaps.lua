@@ -39,7 +39,7 @@ end, { desc = "Open Git remote repository" })
 
 -- Open image with system viewer
 map("n", "<leader>oi", function()
-  vim.fn.jobstart({ "xdg-open", vim.fn.expand("%:p") }, { detach = true })
+  vim.ui.open(vim.fn.expand("%:p"))
 end, { desc = "Open image with system viewer" })
 
 -- Copy code with file path and line numbers for AI context
