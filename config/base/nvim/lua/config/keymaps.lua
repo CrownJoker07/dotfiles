@@ -77,10 +77,6 @@ local function copy_ai_context(start_line, end_line)
   local root = find_project_root(file)
   local rel = relative_path(root, file)
   local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
-  local width = #tostring(end_line)
-  for i, line in ipairs(lines) do
-    lines[i] = string.format("%" .. width .. "d | %s", start_line + i - 1, line)
-  end
   local code = table.concat(lines, "\n")
   local line_range = start_line == end_line and tostring(start_line) or start_line .. "-" .. end_line
   local result = string.format("@/%s:%s\n```\n%s\n```", rel, line_range, code)
