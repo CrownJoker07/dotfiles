@@ -5,6 +5,12 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Ensure Mason binaries are in PATH before any plugin loads
+local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+if vim.fn.isdirectory(mason_bin) == 1 then
+  vim.env.PATH = mason_bin .. ":" .. vim.env.PATH
+end
+
 -- Basic config
 require("config.options")
 require("config.keymaps")
