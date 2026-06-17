@@ -102,13 +102,17 @@ local function auto_save()
     return
   end
 
-  vim.cmd("silent! update")
+  local ok, err = pcall(vim.cmd, "update")
+  if not ok then
+    vim.notify("Auto-save failed: " .. tostring(err), vim.log.levels.WARN)
+  end
 end
 
 vim.api.nvim_create_autocmd({
   "InsertLeave",
   "BufLeave",
   "FocusLost",
+  "CursorHoldI",
 }, {
   group = save_group,
   callback = auto_save,
