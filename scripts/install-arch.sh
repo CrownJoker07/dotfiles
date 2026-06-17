@@ -229,6 +229,10 @@ print_summary() {
 
   2. WezTerm is configured via ~/.config/wezterm/wezterm.lua
      (symlinked from dotfiles). Restart WezTerm if already open.
+
+  3. Enable and start Tailscale:
+       sudo systemctl enable --now tailscaled
+       sudo tailscale up
 EOF
 }
 

@@ -34,3 +34,4 @@ wezterm
 
 # ==================== 系统服务 ====================
 power-profiles-daemon
+tailscale
