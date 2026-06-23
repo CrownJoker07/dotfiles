@@ -134,6 +134,17 @@ link_tree_files() {
     dst="$dst_root/$rel"
     link_item "$src" "$dst"
   done < <(find "$src_root" -type f | sort)
+
+  find "$dst_root" -xtype l 2>/dev/null | while IFS= read -r stale; do
+    target="$(readlink "$stale" 2>/dev/null || true)"
+    if is_repo_path "$target"; then
+      if [ "$DRY_RUN" = true ]; then
+        echo "✗ would remove stale link: $stale"
+      else
+        rm "$stale" && echo "✗ removed stale link: $stale"
+      fi
+    fi
+  done
 }
 
 echo "OS: $OS_NAME"
