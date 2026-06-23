@@ -10,14 +10,6 @@ return {
         install_dir = vim.fn.stdpath("data") .. "/site",
       })
 
-      if vim.fn.executable("tree-sitter") ~= 1 then
-        vim.schedule(function()
-          vim.notify("tree-sitter CLI is managed by Mason; restart Neovim after Mason installs it.", vim.log.levels.WARN)
-        end)
-        return
-      end
-
-      -- Parser names
       require("nvim-treesitter").install({
         "c_sharp",
         "lua",
@@ -29,7 +21,6 @@ return {
         "markdown_inline",
       })
 
-      -- Filetype names
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
           "cs",
