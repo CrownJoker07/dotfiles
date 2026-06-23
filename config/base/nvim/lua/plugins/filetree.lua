@@ -154,11 +154,9 @@ return {
           },
         },
 
-        -- 打开文件的行为
         actions = {
           open_file = {
-            quit_on_open = false, -- 打开文件时不关闭 tree
-            resize_window = true, -- 打开文件后自动调整窗口大小
+            resize_window = false, -- 打开文件后不自动调整窗口大小
           },
         },
       }
