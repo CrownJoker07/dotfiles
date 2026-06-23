@@ -1,46 +1,8 @@
 return {
-  -- External tool manager: LSP servers, formatters, linters, DAP servers
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      registries = {
-        "github:mason-org/mason-registry",
-        "github:Crashdummyy/mason-registry",
-      },
-      ui = {
-        icons = {
-          package_installed = "✓",
-          package_pending = "➜",
-          package_uninstalled = "✗",
-        },
-      },
-    },
-  },
-
-  -- Mason package bootstrap
-  {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = {
-      "mason-org/mason.nvim",
-    },
-    opts = {
-      ensure_installed = {
-        "csharpier",
-        "prettier",
-        "roslyn",
-        "shfmt",
-        "stylua",
-        "tree-sitter-cli",
-      },
-    },
-  },
-
-  -- LSP config collection
   {
     "neovim/nvim-lspconfig",
   },
 
-  -- C# / Roslyn LSP
   {
     "seblyng/roslyn.nvim",
     ft = {

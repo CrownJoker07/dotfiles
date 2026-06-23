@@ -1,10 +1,6 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    dependencies = {
-      "mason-org/mason.nvim",
-      "WhoIsSethDaniel/mason-tool-installer.nvim",
-    },
     config = function()
       require("nvim-treesitter").setup({
         install_dir = vim.fn.stdpath("data") .. "/site",
