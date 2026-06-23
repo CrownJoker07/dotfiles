@@ -1,12 +1,5 @@
--- AUTOCOMMANDS
 local map = vim.keymap.set
 
--- Autoread when file changed externally
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
-  command = "checktime",
-})
-
--- Highlight when yanking
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking text",
   callback = function()
@@ -18,27 +11,89 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
--- LSP keymaps
 vim.api.nvim_create_autocmd("LspAttach", {
   desc = "LSP keymaps",
   callback = function(event)
-    local function lsp_map(keys, func, desc)
-      map("n", keys, func, {
-        buffer = event.buf,
-        desc = desc,
-      })
-    end
-
-    lsp_map("gd", vim.lsp.buf.definition, "Go to definition")
-    lsp_map("gD", vim.lsp.buf.declaration, "Go to declaration")
-    lsp_map("gr", vim.lsp.buf.references, "Go to references")
-    lsp_map("gi", vim.lsp.buf.implementation, "Go to implementation")
-    lsp_map("gt", vim.lsp.buf.type_definition, "Go to type definition")
-    lsp_map("K", vim.lsp.buf.hover, "Hover documentation")
-    lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
-    lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code action")
+    map("n", "grd", vim.lsp.buf.definition, {
+      buffer = event.buf,
+      desc = "Go to definition",
+    })
   end,
 })
 
+do
+  local excluded = {
+    gitcommit = true,
+    gitrebase = true,
+    lazy = true,
+    mason = true,
+    help = true,
+    qf = true,
+  }
 
+  local timers = {}
+  local group = vim.api.nvim_create_augroup("AutoSave", { clear = true })
 
+  local function cancel_timer(buf)
+    if timers[buf] then
+      timers[buf]:close()
+      timers[buf] = nil
+    end
+  end
+
+  local function save(buf)
+    if not vim.bo[buf].modified then
+      return
+    end
+    vim.cmd("silent! write")
+  end
+
+  local function defer_save(buf)
+    cancel_timer(buf)
+    timers[buf] = vim.defer_fn(function()
+      save(buf)
+      timers[buf] = nil
+    end, 1000)
+  end
+
+  vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+    group = group,
+    callback = function(args)
+      if excluded[vim.bo.filetype] or not vim.bo.modifiable then
+        return
+      end
+      defer_save(args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "QuitPre" }, {
+    group = group,
+    callback = function(args)
+      if excluded[vim.bo.filetype] or not vim.bo.modifiable then
+        return
+      end
+      save(args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("InsertEnter", {
+    group = group,
+    callback = function(args)
+      cancel_timer(args.buf)
+    end,
+  })
+
+  vim.api.nvim_create_user_command("ASToggle", function()
+    local active = #vim.api.nvim_get_autocmds({ group = group }) > 0
+    if active then
+      vim.api.nvim_clear_autocmds({ group = group })
+      for _, t in pairs(timers) do
+        t:close()
+      end
+      timers = {}
+      vim.notify("Auto-save off", vim.log.levels.INFO)
+    else
+      vim.notify("Auto-save on -- restart required", vim.log.levels.INFO)
+    end
+  end, { desc = "Toggle auto-save" })
+end
