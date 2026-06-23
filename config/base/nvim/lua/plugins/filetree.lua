@@ -1,7 +1,7 @@
 return {
   {
     "nvim-tree/nvim-tree.lua",
-    version = "*",
+    version = "2.*",
     dependencies = {
       "nvim-tree/nvim-web-devicons", -- 文件图标依赖
     },
