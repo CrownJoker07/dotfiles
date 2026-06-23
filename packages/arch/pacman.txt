@@ -21,10 +21,8 @@ unzip
 zoxide
 
 # ==================== 开发工具 ====================
-dotnet-sdk-10.0
 lazygit
-nodejs
-npm
+mise
 openai-codex
 opencode
 python-pynvim

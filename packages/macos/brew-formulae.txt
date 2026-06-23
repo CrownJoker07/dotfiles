@@ -21,8 +21,7 @@ unzip
 zoxide
 
 # ==================== 开发工具 ====================
-dotnet@10
 git
 lazygit
-node
+mise
 opencode

@@ -177,6 +177,19 @@ install_tmux_plugins() {
   echo "✓ tmux plugins installed"
 }
 
+install_mise_tools() {
+  section "mise dev tools"
+
+  if ! command -v mise >/dev/null 2>&1; then
+    echo "⊘ skip: mise not found"
+    return 0
+  fi
+
+  echo "→ installing tools from ~/.config/mise/config.toml..."
+  mise install
+  echo "✓ mise tools ready"
+}
+
 print_summary() {
   section "Post-install notes"
   cat <<'EOF'
@@ -192,4 +205,5 @@ install_brew_formulae
 install_brew_casks
 ensure_jetbrains_nerd_font
 install_tmux_plugins
+install_mise_tools
 print_summary

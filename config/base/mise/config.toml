@@ -1,0 +1,4 @@
+[tools]
+dotnet = "10.0"
+node = "lts"
+python = "latest"
