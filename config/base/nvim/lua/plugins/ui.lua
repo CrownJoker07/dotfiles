@@ -57,12 +57,6 @@ return {
       cursor_scrolls_alone = true,
       duration_multiplier = 0.8,
       easing = "sine",
-      pre_hook = function()
-        vim.opt.cursorline = false
-      end,
-      post_hook = function()
-        vim.opt.cursorline = true
-      end,
     },
     keys = {
       { "<C-u>", function() require("neoscroll").ctrl_u({ duration = 200 }) end, mode = { "n", "v", "x" } },
