@@ -2,7 +2,11 @@
 local map = vim.keymap.set
 
 -- Clear search highlight
-map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+map("n", "<Esc>", function()
+  if vim.v.hlsearch and vim.v.hlsearch == 1 then
+    vim.cmd("nohlsearch")
+  end
+end, { desc = "Clear search highlight" })
 
 -- Save / quit
 map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
