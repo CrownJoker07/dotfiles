@@ -2,7 +2,7 @@
 local map = vim.keymap.set
 
 -- Autoread when file changed externally
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
   command = "checktime",
 })
 
@@ -40,24 +40,5 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
--- USER COMMANDS
-vim.api.nvim_create_user_command("GitBlameLine", function()
-  local line_number = vim.fn.line(".")
-  local filename = vim.api.nvim_buf_get_name(0)
 
-  if filename == "" then
-    print("No file name")
-    return
-  end
-
-  local result = vim.system({
-    "git",
-    "blame",
-    "-L",
-    line_number .. ",+1",
-    filename,
-  }):wait()
-
-  print(result.stdout)
-end, { desc = "Print the git blame for the current line" })
 
