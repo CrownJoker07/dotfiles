@@ -28,8 +28,4 @@ vim.o.timeoutlen = 500
 vim.o.autoread = true
 
 -- Sync clipboard between OS and Neovim
-vim.api.nvim_create_autocmd("UIEnter", {
-  callback = function()
-    vim.o.clipboard = "unnamedplus"
-  end,
-})
+vim.o.clipboard = "unnamedplus"
