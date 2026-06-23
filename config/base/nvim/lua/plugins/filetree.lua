@@ -2,7 +2,6 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
-    lazy = false, -- 官方建议不懒加载，避免与 netrw、session 插件产生启动顺序问题
     dependencies = {
       "nvim-tree/nvim-web-devicons", -- 文件图标依赖
     },
