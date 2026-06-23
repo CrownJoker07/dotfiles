@@ -19,7 +19,8 @@ return {
       winopts = {
         fullscreen = true,
         preview = {
-          hidden = true,
+          horizontal = "right:40%",
+          vertical = "down:35%",
         },
       },
       defaults = {
