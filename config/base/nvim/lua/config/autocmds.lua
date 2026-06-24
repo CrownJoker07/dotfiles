@@ -33,6 +33,7 @@ do
 
   local timers = {}
   local group = vim.api.nvim_create_augroup("AutoSave", { clear = true })
+  local enabled = true
 
   local function cancel_timer(buf)
     if timers[buf] then
@@ -41,51 +42,65 @@ do
     end
   end
 
+  local function can_save(buf)
+    return vim.api.nvim_buf_is_valid(buf)
+      and vim.api.nvim_buf_is_loaded(buf)
+      and vim.bo[buf].modifiable
+      and not excluded[vim.bo[buf].filetype]
+  end
+
   local function save(buf)
-    if not vim.bo[buf].modified then
+    if not can_save(buf) or not vim.bo[buf].modified then
       return
     end
-    vim.cmd("silent! write")
+    vim.api.nvim_buf_call(buf, function()
+      vim.cmd("silent! write")
+    end)
   end
 
   local function defer_save(buf)
     cancel_timer(buf)
     timers[buf] = vim.defer_fn(function()
-      save(buf)
       timers[buf] = nil
+      if enabled then
+        save(buf)
+      end
     end, 1000)
   end
 
-  vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-    group = group,
-    callback = function(args)
-      if excluded[vim.bo.filetype] or not vim.bo.modifiable then
-        return
-      end
-      defer_save(args.buf)
-    end,
-  })
+  local function setup_autocmds()
+    vim.api.nvim_clear_autocmds({ group = group })
 
-  vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "QuitPre" }, {
-    group = group,
-    callback = function(args)
-      if excluded[vim.bo.filetype] or not vim.bo.modifiable then
-        return
-      end
-      save(args.buf)
-    end,
-  })
+    vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+      group = group,
+      callback = function(args)
+        if can_save(args.buf) then
+          defer_save(args.buf)
+        end
+      end,
+    })
 
-  vim.api.nvim_create_autocmd("InsertEnter", {
-    group = group,
-    callback = function(args)
-      cancel_timer(args.buf)
-    end,
-  })
+    vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "QuitPre" }, {
+      group = group,
+      callback = function(args)
+        cancel_timer(args.buf)
+        save(args.buf)
+      end,
+    })
+
+    vim.api.nvim_create_autocmd("InsertEnter", {
+      group = group,
+      callback = function(args)
+        cancel_timer(args.buf)
+      end,
+    })
+  end
+
+  setup_autocmds()
 
   vim.api.nvim_create_user_command("ASToggle", function()
-    local active = #vim.api.nvim_get_autocmds({ group = group }) > 0
-    if active then
+    enabled = not enabled
+    if not enabled then
       vim.api.nvim_clear_autocmds({ group = group })
       for _, t in pairs(timers) do
         t:close()
@@ -93,7 +108,8 @@ do
       timers = {}
       vim.notify("Auto-save off", vim.log.levels.INFO)
     else
-      vim.notify("Auto-save on -- restart required", vim.log.levels.INFO)
+      setup_autocmds()
+      vim.notify("Auto-save on", vim.log.levels.INFO)
     end
   end, { desc = "Toggle auto-save" })
 end
