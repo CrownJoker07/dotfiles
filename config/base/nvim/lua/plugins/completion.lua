@@ -2,6 +2,10 @@ return {
   {
     "saghen/blink.cmp",
     version = "1.*",
+    event = {
+      "InsertEnter",
+      "CmdlineEnter",
+    },
     opts = {
       keymap = {
         preset = 'super-tab',
