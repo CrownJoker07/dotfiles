@@ -27,6 +27,7 @@ return {
         "roslyn-language-server",
         "shfmt",
         "stylua",
+        "tree-sitter-cli",
       },
     },
   },
