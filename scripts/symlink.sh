@@ -119,7 +119,7 @@ prepare_tree_dirs() {
 }
 
 link_tree_files() {
-  local src_root="$1" dst_root="$2"
+  local src_root="$1" dst_root="$2" maxdepth="${3:-}"
   local src rel dst
 
   if [ ! -d "$src_root" ]; then
@@ -135,7 +135,9 @@ link_tree_files() {
     link_item "$src" "$dst"
   done < <(find "$src_root" -type f | sort)
 
-  find "$dst_root" -xtype l 2>/dev/null | while IFS= read -r stale; do
+  local find_depth=""
+  [ -n "$maxdepth" ] && find_depth="-maxdepth $maxdepth"
+  find "$dst_root" $find_depth -type l ! -exec test -e {} \; -print 2>/dev/null | while IFS= read -r stale; do
     target="$(readlink "$stale" 2>/dev/null || true)"
     if is_repo_path "$target"; then
       if [ "$DRY_RUN" = true ]; then
@@ -150,13 +152,13 @@ link_tree_files() {
 echo "OS: $OS_NAME"
 
 section "Base config"
-link_tree_files "$DOTFILES_DIR/config/base" "$XDG_CONFIG_DIR"
+link_tree_files "$DOTFILES_DIR/config/base" "$XDG_CONFIG_DIR" 4
 
 section "$OS_NAME config"
-link_tree_files "$DOTFILES_DIR/config/$OS_NAME" "$XDG_CONFIG_DIR"
+link_tree_files "$DOTFILES_DIR/config/$OS_NAME" "$XDG_CONFIG_DIR" 4
 
 section "Base home"
-link_tree_files "$DOTFILES_DIR/home/base" "$HOME"
+link_tree_files "$DOTFILES_DIR/home/base" "$HOME" 1
 
 section "$OS_NAME home"
-link_tree_files "$DOTFILES_DIR/home/$OS_NAME" "$HOME"
+link_tree_files "$DOTFILES_DIR/home/$OS_NAME" "$HOME" 1
