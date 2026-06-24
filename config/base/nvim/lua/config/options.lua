@@ -25,7 +25,5 @@ vim.o.splitbelow = true
 vim.o.updatetime = 250
 vim.o.timeoutlen = 500
 
-vim.o.autoread = true
-
 -- Sync clipboard between OS and Neovim
 vim.o.clipboard = "unnamedplus"

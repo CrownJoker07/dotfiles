@@ -49,14 +49,6 @@ return {
   {
     "karb94/neoscroll.nvim",
     event = "VeryLazy",
-    opts = {
-      hide_cursor = true,
-      stop_eof = true,
-      respect_scrolloff = true,
-      cursor_scrolls_alone = true,
-      duration_multiplier = 0.8,
-      easing = "sine",
-    },
     keys = {
       { "<C-u>", function() require("neoscroll").ctrl_u({ duration = 200 }) end, mode = { "n", "v", "x" } },
       { "<C-d>", function() require("neoscroll").ctrl_d({ duration = 200 }) end, mode = { "n", "v", "x" } },
