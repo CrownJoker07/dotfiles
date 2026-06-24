@@ -1,9 +1,5 @@
 return {
   {
-    "neovim/nvim-lspconfig",
-  },
-
-  {
     "seblyng/roslyn.nvim",
     ft = {
       "cs",
@@ -11,7 +7,6 @@ return {
       "cshtml",
     },
     dependencies = {
-      "neovim/nvim-lspconfig",
       "saghen/blink.cmp",
     },
     opts = {
