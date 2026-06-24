@@ -6,7 +6,13 @@ return {
     },
     cmd = "FzfLua",
     keys = {
-      { "<leader>ff", "<cmd>FzfLua files<CR>", desc = "Find files" },
+      {
+        "<leader>ff",
+        function()
+          require("fzf-lua").files({ previewer = false })
+        end,
+        desc = "Find files",
+      },
       { "<leader>fg", "<cmd>FzfLua live_grep<CR>", desc = "Live grep" },
       { "<leader>fb", "<cmd>FzfLua buffers<CR>", desc = "Find buffers" },
       { "<leader>fr", "<cmd>FzfLua oldfiles<CR>", desc = "Recent files" },
