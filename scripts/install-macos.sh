@@ -194,7 +194,7 @@ print_summary() {
   section "Post-install notes"
   cat <<'EOF'
   1. Roslyn language server is managed by Neovim Mason.
-     Open Neovim and run :MasonInstall roslyn if it is not
+     Open Neovim and run :MasonInstall roslyn-language-server if it is not
      installed automatically.
 EOF
 }
