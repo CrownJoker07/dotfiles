@@ -50,10 +50,7 @@ local function format()
     return
   end
 
-  vim.notify(
-    "No formatter supports reliable range formatting for this buffer",
-    vim.log.levels.WARN
-  )
+  vim.notify("No formatter supports reliable range formatting for this buffer", vim.log.levels.WARN)
 end
 
 return {

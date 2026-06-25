@@ -8,7 +8,7 @@ return {
     },
     opts = {
       keymap = {
-        preset = 'super-tab',
+        preset = "super-tab",
       },
       completion = {
         documentation = {

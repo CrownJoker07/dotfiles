@@ -1,17 +1,21 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = false,
+    build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter").install({
-        "c_sharp",
-        "lua",
-        "vim",
-        "vimdoc",
-        "json",
-        "bash",
-        "markdown",
-        "markdown_inline",
-      })
+      if #vim.api.nvim_list_uis() > 0 then
+        require("nvim-treesitter").install({
+          "c_sharp",
+          "lua",
+          "vim",
+          "vimdoc",
+          "json",
+          "bash",
+          "markdown",
+          "markdown_inline",
+        })
+      end
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = {
