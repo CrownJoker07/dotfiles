@@ -125,13 +125,6 @@ return {
           },
         },
 
-        -- git 状态显示
-        git = {
-          enable = true,
-          show_on_dirs = true, -- 目录也显示 git 状态
-          show_on_open_dirs = true, -- 只在展开的目录显示
-        },
-
         -- LSP 诊断信息（错误、警告）显示
         diagnostics = {
           enable = true,
