@@ -103,18 +103,6 @@ return {
           highlight_git = "icon",
           highlight_opened_files = "name",
           highlight_modified = "name",
-
-          -- 图标显示配置
-          icons = {
-            show = {
-              file = true, -- 文件图标
-              folder = true, -- 文件夹图标
-              folder_arrow = true, -- 文件夹展开/收起箭头（▶/▼）
-              git = true, -- git 状态图标（✗、+、~ 等）
-              modified = true, -- 修改标记图标
-              diagnostics = true, -- LSP 诊断图标（错误、警告等）
-            },
-          },
         },
 
         -- 切换文件时自动定位 tree 到当前文件
