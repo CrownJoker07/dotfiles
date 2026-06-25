@@ -22,6 +22,26 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 do
+  local group = vim.api.nvim_create_augroup("AutoReload", { clear = true })
+
+  vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+    group = group,
+    callback = function()
+      if vim.fn.mode() ~= "c" then
+        vim.cmd("checktime")
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("FileChangedShellPost", {
+    group = group,
+    callback = function()
+      vim.notify("File changed on disk, buffer reloaded", vim.log.levels.INFO)
+    end,
+  })
+end
+
+do
   local excluded = {
     gitcommit = true,
     gitrebase = true,
