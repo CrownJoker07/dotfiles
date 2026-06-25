@@ -46,7 +46,6 @@ return {
   -- Smooth scrolling
   {
     "karb94/neoscroll.nvim",
-    event = "VeryLazy",
     keys = {
       { "<C-u>", function() require("neoscroll").ctrl_u({ duration = 100, easing = "quadratic" }) end, mode = { "n", "v", "x" } },
       { "<C-d>", function() require("neoscroll").ctrl_d({ duration = 100, easing = "quadratic" }) end, mode = { "n", "v", "x" } },
