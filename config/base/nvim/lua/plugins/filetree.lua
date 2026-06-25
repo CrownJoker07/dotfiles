@@ -108,9 +108,6 @@ return {
         -- 切换文件时自动定位 tree 到当前文件
         update_focused_file = {
           enable = true,
-          update_root = {
-            enable = false, -- 不自动改变 tree 的根目录，避免突然跳目录
-          },
         },
 
         -- LSP 诊断信息（错误、警告）显示
