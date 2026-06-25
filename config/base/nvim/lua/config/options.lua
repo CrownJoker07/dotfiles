@@ -11,6 +11,7 @@ vim.o.list = true
 vim.o.listchars = "tab:» ,trail:·,nbsp:␣"
 
 vim.o.confirm = true
+vim.o.autoread = true
 vim.o.termguicolors = true
 vim.o.signcolumn = "yes"
 
