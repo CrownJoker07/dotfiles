@@ -117,13 +117,11 @@ return {
         diagnostics = {
           enable = true,
           show_on_dirs = true,
-          show_on_open_dirs = true,
         },
 
         -- 修改标记（文件被修改但未保存）
         modified = {
           enable = true,
-          show_on_dirs = true,
         },
 
         -- 隐藏 .git 目录
