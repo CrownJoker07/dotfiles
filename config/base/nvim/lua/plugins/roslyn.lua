@@ -11,6 +11,7 @@ return {
     },
     opts = {
       broad_search = false,
+      filewatching = "roslyn",
     },
     config = function(_, opts)
       vim.lsp.config("roslyn", {
