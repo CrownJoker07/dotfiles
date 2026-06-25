@@ -9,9 +9,7 @@ return {
         { "<leader>f", group = "find" },
         { "<leader>g", group = "git" },
         { "<leader>c", group = "code" },
-        { "<leader>r", group = "rename" },
         { "<leader>x", group = "diagnostics" },
-        { "<leader>w", group = "window/write" },
       },
     },
     keys = {
