@@ -138,12 +138,10 @@ return {
           show_on_dirs = true,
         },
 
-        -- 过滤器：控制哪些文件显示/隐藏
+        -- 隐藏 .git 目录
         filters = {
-          dotfiles = false, -- false = 显示 dotfiles（.gitignore、.env 等）
-          git_ignored = true, -- 隐藏 git ignored 的文件（node_modules、Library 等）
           custom = {
-            "^\\.git$", -- 额外隐藏 .git 目录
+            "^\\.git$",
           },
         },
 
