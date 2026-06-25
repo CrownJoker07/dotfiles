@@ -51,13 +51,13 @@ local function defer_save(buf)
     if enabled then
       save(buf)
     end
-  end, 1000)
+  end, 500)
 end
 
 local function setup_autocmds()
   vim.api.nvim_clear_autocmds({ group = group })
 
-  vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
+  vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged", "TextChangedI" }, {
     group = group,
     callback = function(args)
       if can_save(args.buf) then
@@ -71,13 +71,6 @@ local function setup_autocmds()
     callback = function(args)
       cancel_timer(args.buf)
       save(args.buf)
-    end,
-  })
-
-  vim.api.nvim_create_autocmd("InsertEnter", {
-    group = group,
-    callback = function(args)
-      cancel_timer(args.buf)
     end,
   })
 
