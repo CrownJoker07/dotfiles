@@ -1,6 +1,7 @@
 return {
   {
     "saghen/blink.cmp",
+    -- Use tagged releases so blink can download prebuilt fuzzy matcher binaries.
     version = "1.*",
     event = {
       "InsertEnter",
