@@ -8,6 +8,7 @@ return {
     opts = {
       modes = {
         symbols = {
+          -- Use Trouble as a full-screen symbol navigator, closing after jump.
           focus = true,
           win = {
             type = "float",
@@ -23,16 +24,48 @@ return {
       },
     },
     keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>", desc = "Diagnostics" },
-      { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", desc = "Buffer diagnostics" },
-      { "<leader>cs", "<cmd>Trouble symbols toggle<CR>", desc = "Symbols" },
+      {
+        "<leader>xx",
+        function()
+          require("trouble").toggle("diagnostics")
+        end,
+        desc = "Diagnostics",
+      },
+      {
+        "<leader>xX",
+        function()
+          require("trouble").toggle({ mode = "diagnostics", filter = { buf = 0 } })
+        end,
+        desc = "Buffer diagnostics",
+      },
+      {
+        "<leader>cs",
+        function()
+          require("trouble").toggle("symbols")
+        end,
+        desc = "Symbols",
+      },
       {
         "<leader>cl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<CR>",
+        function()
+          require("trouble").toggle({ mode = "lsp", focus = false, win = { position = "right" } })
+        end,
         desc = "LSP definitions/references",
       },
-      { "<leader>xL", "<cmd>Trouble loclist toggle<CR>", desc = "Location list" },
-      { "<leader>xQ", "<cmd>Trouble qflist toggle<CR>", desc = "Quickfix list" },
+      {
+        "<leader>xL",
+        function()
+          require("trouble").toggle("loclist")
+        end,
+        desc = "Location list",
+      },
+      {
+        "<leader>xQ",
+        function()
+          require("trouble").toggle("qflist")
+        end,
+        desc = "Quickfix list",
+      },
     },
   },
 }
