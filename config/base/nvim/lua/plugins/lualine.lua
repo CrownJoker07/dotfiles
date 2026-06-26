@@ -7,8 +7,8 @@ return {
     event = "VeryLazy",
     opts = {
       options = {
-        theme = "auto",
         globalstatus = true,
+        -- Keep the statusline visually flat.
         component_separators = "",
         section_separators = "",
       },
