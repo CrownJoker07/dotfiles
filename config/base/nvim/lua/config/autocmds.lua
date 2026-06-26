@@ -27,17 +27,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 local reload_group = vim.api.nvim_create_augroup("AutoReload", { clear = true })
 
+-- autoread does not watch files by itself; checktime triggers the reload check.
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
   group = reload_group,
+  desc = "Check for files changed outside Neovim",
   callback = function()
     if vim.fn.mode() ~= "c" then
-      vim.cmd("checktime")
+      vim.cmd.checktime()
     end
   end,
 })
 
 vim.api.nvim_create_autocmd("FileChangedShellPost", {
   group = reload_group,
+  desc = "Notify when a file is reloaded after external changes",
   callback = function()
     vim.notify("File changed on disk, buffer reloaded", vim.log.levels.INFO)
   end,

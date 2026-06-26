@@ -19,8 +19,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  { import = "plugins" },
-}, {
+  spec = {
+    { import = "plugins" },
+  },
   checker = {
     enabled = false,
     notify = false,
@@ -28,6 +29,8 @@ require("lazy").setup({
   change_detection = {
     notify = false,
   },
+
+  -- Keep plugin/tool management inside lazy.nvim/Mason and avoid luarocks/hererocks.
   rocks = {
     enabled = false,
   },

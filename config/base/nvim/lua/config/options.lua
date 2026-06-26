@@ -1,30 +1,40 @@
--- OPTIONS
-vim.o.number = true
-vim.o.relativenumber = true
+local opt = vim.opt
 
-vim.o.ignorecase = true
-vim.o.smartcase = true
+opt.number = true
+opt.relativenumber = true
 
-vim.o.cursorline = true
-vim.o.scrolloff = 10
-vim.o.list = true
-vim.o.listchars = "tab:» ,trail:·,nbsp:␣"
+opt.ignorecase = true
+opt.smartcase = true
 
-vim.o.confirm = true
-vim.o.autoread = true
-vim.o.termguicolors = true
-vim.o.signcolumn = "yes"
+opt.cursorline = true
+opt.scrolloff = 10
+opt.list = true
+opt.listchars = {
+  tab = "» ",
+  trail = "·",
+  nbsp = "␣",
+}
 
-vim.o.expandtab = true
-vim.o.shiftwidth = 2
-vim.o.tabstop = 2
-vim.o.smartindent = true
+opt.confirm = true
 
-vim.o.splitright = true
-vim.o.splitbelow = true
+-- Used with the checktime autocmds to reload files changed by external tools.
+opt.autoread = true
+opt.termguicolors = true
+opt.signcolumn = "yes"
+opt.showmode = false
+opt.undofile = true
 
-vim.o.updatetime = 250
-vim.o.timeoutlen = 500
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.tabstop = 2
 
--- Sync clipboard between OS and Neovim
-vim.o.clipboard = "unnamedplus"
+opt.splitright = true
+opt.splitbelow = true
+
+opt.updatetime = 250
+opt.timeoutlen = 500
+
+-- Delay clipboard setup to avoid slowing down startup while provider detection runs.
+vim.schedule(function()
+  opt.clipboard = "unnamedplus"
+end)
