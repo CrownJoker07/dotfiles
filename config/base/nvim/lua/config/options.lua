@@ -17,7 +17,8 @@ opt.listchars = {
 
 opt.confirm = true
 
--- Used with the checktime autocmds to reload files changed by external tools.
+-- Neovim currently defaults 'autoread' to true, but keep it explicit because
+-- external edits from AI/tools rely on the checktime autocmds in autocmds.lua.
 opt.autoread = true
 opt.termguicolors = true
 opt.signcolumn = "yes"
