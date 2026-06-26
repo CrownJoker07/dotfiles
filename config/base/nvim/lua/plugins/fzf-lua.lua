@@ -9,16 +9,53 @@ return {
       {
         "<leader>ff",
         function()
+          -- File search is usually faster without a preview window.
           require("fzf-lua").files({ previewer = false })
         end,
         desc = "Find files",
       },
-      { "<leader>fg", "<cmd>FzfLua live_grep<CR>", desc = "Live grep" },
-      { "<leader>fb", "<cmd>FzfLua buffers<CR>", desc = "Find buffers" },
-      { "<leader>fr", "<cmd>FzfLua oldfiles<CR>", desc = "Recent files" },
-      { "<leader>fh", "<cmd>FzfLua helptags<CR>", desc = "Help tags" },
-      { "<leader>fs", "<cmd>FzfLua lsp_document_symbols<CR>", desc = "Document symbols" },
-      { "<leader>fS", "<cmd>FzfLua lsp_workspace_symbols<CR>", desc = "Workspace symbols" },
+      {
+        "<leader>fg",
+        function()
+          require("fzf-lua").live_grep()
+        end,
+        desc = "Live grep",
+      },
+      {
+        "<leader>fb",
+        function()
+          require("fzf-lua").buffers()
+        end,
+        desc = "Find buffers",
+      },
+      {
+        "<leader>fr",
+        function()
+          require("fzf-lua").oldfiles()
+        end,
+        desc = "Recent files",
+      },
+      {
+        "<leader>fh",
+        function()
+          require("fzf-lua").helptags()
+        end,
+        desc = "Help tags",
+      },
+      {
+        "<leader>fs",
+        function()
+          require("fzf-lua").lsp_document_symbols()
+        end,
+        desc = "Document symbols",
+      },
+      {
+        "<leader>fS",
+        function()
+          require("fzf-lua").lsp_workspace_symbols()
+        end,
+        desc = "Workspace symbols",
+      },
     },
     opts = {
       fzf_colors = true,
