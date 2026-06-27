@@ -47,7 +47,7 @@ ensure_archlinuxcn_repo() {
   fi
 
   echo "→ installing archlinuxcn keyring..."
-  sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
+  sudo pacman -Syu --needed --noconfirm archlinuxcn-keyring
   echo "✓ archlinuxcn ready"
 }
 
@@ -65,11 +65,7 @@ install_pacman_packages() {
     packages+=("$entry")
   done <<< "$packages_str"
 
-  if [ "${#packages[@]}" -gt 0 ]; then
-    while IFS= read -r pkg; do
-      [ -n "$pkg" ] && packages+=("$pkg")
-    done < <(printf '%s\n' "${packages[@]}" | sort -u)
-  fi
+  mapfile -t packages < <(printf '%s\n' "${packages[@]}" | sort -u)
 
   if [ "${#packages[@]}" -eq 0 ]; then
     echo "⊘ no packages to install"
