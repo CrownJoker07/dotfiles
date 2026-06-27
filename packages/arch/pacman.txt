@@ -13,8 +13,10 @@ eza
 fastfetch
 fd
 fzf
+git
 man-db
 man-pages
+ripgrep
 starship
 tmux
 unzip
@@ -25,7 +27,6 @@ lazygit
 mise
 openai-codex
 opencode
-python-pynvim
 
 # ==================== 应用程序 ====================
 steam

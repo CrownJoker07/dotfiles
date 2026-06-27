@@ -27,12 +27,6 @@ read_package_list() {
   grep -v '^$' "$file" | grep -v '^#' || true
 }
 
-install_base_deps() {
-  section "Base deps (git)"
-  sudo pacman -S --needed --noconfirm git
-  echo "✓ base deps ready"
-}
-
 ensure_archlinuxcn_repo() {
   section "archlinuxcn repository"
 
@@ -245,7 +239,6 @@ print_summary() {
 EOF
 }
 
-install_base_deps
 ensure_archlinuxcn_repo
 install_archlinuxcn_packages
 install_pacman_packages
