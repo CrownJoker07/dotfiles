@@ -1,7 +1,10 @@
-local yank_group = vim.api.nvim_create_augroup("HighlightYank", { clear = true })
+local function augroup(name)
+  return vim.api.nvim_create_augroup("config_" .. name, { clear = true })
+end
 
+-- Highlight yank
 vim.api.nvim_create_autocmd("TextYankPost", {
-  group = yank_group,
+  group = augroup("highlight_yank"),
   desc = "Highlight when yanking text",
   callback = function()
     if vim.hl and vim.hl.on_yank then
@@ -12,10 +15,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
-local lsp_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
-
+-- LSP keymaps
 vim.api.nvim_create_autocmd("LspAttach", {
-  group = lsp_group,
+  group = augroup("lsp_keymaps"),
   desc = "LSP keymaps",
   callback = function(event)
     vim.keymap.set("n", "grd", vim.lsp.buf.definition, {
@@ -25,15 +27,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-local reload_group = vim.api.nvim_create_augroup("AutoReload", { clear = true })
-
 local function can_checktime()
   return vim.fn.mode() ~= "c" and vim.bo.buftype == "" and vim.api.nvim_buf_get_name(0) ~= ""
 end
 
+-- Auto reload
 -- autoread does not watch files by itself; checktime triggers the reload check.
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
-  group = reload_group,
+  group = augroup("auto_reload"),
   desc = "Check for files changed outside Neovim",
   callback = function()
     if can_checktime() then
@@ -43,7 +44,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
 })
 
 vim.api.nvim_create_autocmd("FileChangedShellPost", {
-  group = reload_group,
+  group = augroup("auto_reload"),
   desc = "Notify when a file is reloaded after external changes",
   callback = function()
     vim.notify("File changed on disk, buffer reloaded", vim.log.levels.INFO)
