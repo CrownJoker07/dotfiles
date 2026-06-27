@@ -43,9 +43,4 @@ require("lazy").setup({
   change_detection = {
     notify = false,
   },
-
-  -- Keep plugin/tool management inside lazy.nvim/Mason and avoid luarocks/hererocks.
-  rocks = {
-    enabled = false,
-  },
 })
