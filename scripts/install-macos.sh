@@ -102,53 +102,6 @@ install_brew_casks() {
   echo "✓ brew casks ready"
 }
 
-jetbrains_nerd_font_available() {
-  local dir font
-
-  for dir in "$HOME/Library/Fonts" "/Library/Fonts"; do
-    [ -d "$dir" ] || continue
-    for font in "$dir"/JetBrainsMono*NerdFont*.ttf; do
-      [ -e "$font" ] && return 0
-    done
-  done
-
-  return 1
-}
-
-validate_jetbrains_nerd_font() {
-  if jetbrains_nerd_font_available; then
-    echo "✓ font files available"
-    return 0
-  fi
-
-  echo "⊘ warning: JetBrains Mono Nerd Font files were not found in ~/Library/Fonts or /Library/Fonts"
-  echo "  Fully restart Terminal after the font install finishes. If the warning persists, re-run this script."
-  return 1
-}
-
-ensure_jetbrains_nerd_font() {
-  section "Nerd Font (JetBrains Mono)"
-
-  local cask="font-jetbrains-mono-nerd-font"
-
-  if brew list --cask "$cask" >/dev/null 2>&1; then
-    if jetbrains_nerd_font_available; then
-      echo "✓ already installed and available"
-      return
-    fi
-
-    echo "⊘ cask installed, but font files are missing"
-    echo "→ reinstalling..."
-    brew reinstall --cask "$cask"
-    validate_jetbrains_nerd_font || true
-    return
-  fi
-
-  echo "→ installing..."
-  brew install --cask "$cask"
-  validate_jetbrains_nerd_font || true
-}
-
 install_tmux_plugins() {
   section "tmux plugins"
 
@@ -203,7 +156,6 @@ install_xcode_clt
 install_homebrew
 install_brew_formulae
 install_brew_casks
-ensure_jetbrains_nerd_font
 install_tmux_plugins
 install_mise_tools
 print_summary
