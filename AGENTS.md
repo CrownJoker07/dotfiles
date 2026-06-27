@@ -21,7 +21,7 @@ package names, paths, and desktop behavior.
 - Preserve the installer flow: `install.sh` symlinks config first, then runs the
   platform package installer unless `-d` is used.
 - Keep package lists aligned by capability, not necessarily by exact package
-  name. For example, Homebrew `node` corresponds to Arch `nodejs`/`npm`.
+  name. For example, Homebrew cask `codex` corresponds to Arch `openai-codex`.
 - Do not add unrelated refactors or style churn while changing dotfiles.
 
 ## Package Management Rules
@@ -32,6 +32,11 @@ package names, paths, and desktop behavior.
 - Prefer package-managed binary installs: Homebrew on macOS, official `pacman`
   repositories on Arch, and the configured `archlinuxcn` binary repository for
   packages that are not in official Arch repositories.
+- Keep package list files as the source of truth for ordinary packages. Do not
+  add package-specific install, reinstall, or filesystem validation functions
+  to installer scripts when the package can be listed under `packages/`.
+  Bootstrap steps such as Xcode Command Line Tools, Homebrew installation, and
+  Arch repository/keyring setup are acceptable exceptions.
 - AUR packages are allowed only through an already installed AUR helper such as
   `paru` or `yay`. This repository must not build the helper itself; install
   `yay` through `archlinuxcn` when possible.
