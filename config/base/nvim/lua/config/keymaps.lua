@@ -8,17 +8,6 @@ end
 map("n", "<leader>w", "<cmd>w<CR>", opts("Save file"))
 map("n", "<leader>q", "<cmd>q<CR>", opts("Quit"))
 
--- Vim-style window navigation
-map("n", "<C-h>", "<C-w>h", opts("Go to left window"))
-map("n", "<C-j>", "<C-w>j", opts("Go to lower window"))
-map("n", "<C-k>", "<C-w>k", opts("Go to upper window"))
-map("n", "<C-l>", "<C-w>l", opts("Go to right window"))
-
-map("t", "<C-h>", "<C-\\><C-n><C-w>h", opts("Go to left window"))
-map("t", "<C-j>", "<C-\\><C-n><C-w>j", opts("Go to lower window"))
-map("t", "<C-k>", "<C-\\><C-n><C-w>k", opts("Go to upper window"))
-map("t", "<C-l>", "<C-\\><C-n><C-w>l", opts("Go to right window"))
-
 -- Open lazygit
 map("n", "<leader>gg", function()
   if vim.fn.executable("lazygit") == 0 then
