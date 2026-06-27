@@ -41,10 +41,16 @@ package names, paths, and desktop behavior.
   in the official `pacman` or `archlinuxcn` repositories. Use the pacman
   equivalent when available.
 - Homebrew formula installs should use bottles and avoid source fallback.
-- Neovim plugins and editor tools are managed by `lazy.nvim` and Mason. Do not
-  duplicate Mason-managed LSP servers, formatters, or parser tooling in system
-  package lists unless there is a clear reason. This includes `tree-sitter-cli`,
-  `shfmt`, and `stylua`.
+- Neovim plugins and plugin-side Lua package metadata are managed by
+  `lazy.nvim`. Keep lazy package sources enabled, including `rockspec`/rocks,
+  unless a concrete plugin compatibility issue requires a local override.
+- Neovim editor tools are managed by Mason. Do not duplicate Mason-managed LSP
+  servers, formatters, or parser tooling in system package lists unless there
+  is a clear reason. This includes `tree-sitter-cli`, `shfmt`, and `stylua`.
+- Language runtimes and per-user developer toolchains are managed by `mise`.
+  Do not add `node`, `python`, `dotnet`, or similar runtime packages to system
+  package lists unless another system-managed package requires them or desktop
+  integration depends on them.
 - tmux plugins are managed by TPM. The TPM executable itself should come from a
   package manager when possible.
 
