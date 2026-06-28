@@ -21,7 +21,7 @@ return {
       },
       {
         "<leader>tw",
-        ":'<,'>TranslateW<CR>",
+        ":TranslateW --engines=google<CR>",
         mode = "v",
         desc = "Translate selection",
       },
