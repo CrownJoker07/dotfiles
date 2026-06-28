@@ -10,7 +10,7 @@ return {
     init = function()
       vim.g.translator_target_lang = "zh"
       vim.g.translator_source_lang = "auto"
-      vim.g.translator_default_engines = { "bing", "haici", "google" }
+      vim.g.translator_default_engines = { "bing", "haici" }
     end,
     keys = {
       {
