@@ -4,7 +4,7 @@ local excluded_filetypes = {
   help = true,
   lazy = true,
   mason = true,
-  NvimTree = true,
+  netrw = true,
   qf = true,
 }
 
