@@ -16,6 +16,11 @@ opt.listchars = {
 }
 
 opt.confirm = true
+opt.completeopt = {
+  "menuone",
+  "noselect",
+  "popup",
+}
 
 -- Neovim currently defaults 'autoread' to true, but keep it explicit because
 -- external edits from AI/tools rely on the checktime autocmds in autocmds.lua.

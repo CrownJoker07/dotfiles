@@ -2,6 +2,16 @@ local function augroup(name)
   return vim.api.nvim_create_augroup("config_" .. name, { clear = true })
 end
 
+local lsp_completion_group = augroup("lsp_completion")
+local completion_trigger_chars = {}
+for i = 32, 126 do
+  table.insert(completion_trigger_chars, string.char(i))
+end
+
+local function should_trigger_completion(char)
+  return char ~= "" and char:match("[%w_%.:]") ~= nil
+end
+
 -- Highlight yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
@@ -24,6 +34,47 @@ vim.api.nvim_create_autocmd("LspAttach", {
       buffer = event.buf,
       desc = "Go to definition",
     })
+  end,
+})
+
+-- Native LSP completion
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = lsp_completion_group,
+  desc = "Enable native LSP completion",
+  callback = function(event)
+    if not vim.lsp.completion then
+      return
+    end
+
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_completion) then
+      client.server_capabilities.completionProvider.triggerCharacters = completion_trigger_chars
+      vim.lsp.completion.enable(true, client.id, event.buf, {
+        autotrigger = true,
+      })
+
+      if not vim.b[event.buf].native_lsp_completion_trigger then
+        vim.b[event.buf].native_lsp_completion_trigger = true
+
+        vim.api.nvim_create_autocmd("InsertCharPre", {
+          group = lsp_completion_group,
+          buffer = event.buf,
+          desc = "Trigger native LSP completion after typing",
+          callback = function()
+            if vim.fn.pumvisible() == 1 or not should_trigger_completion(vim.v.char) then
+              return
+            end
+
+            local bufnr = vim.api.nvim_get_current_buf()
+            vim.schedule(function()
+              if vim.api.nvim_get_current_buf() == bufnr and vim.lsp.completion then
+                vim.lsp.completion.get()
+              end
+            end)
+          end,
+        })
+      end
+    end
   end,
 })
 

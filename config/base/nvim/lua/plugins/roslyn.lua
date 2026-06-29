@@ -30,9 +30,6 @@ return {
       "razor",
       "cshtml",
     },
-    dependencies = {
-      "saghen/blink.cmp",
-    },
     opts = {
       -- Keep solution discovery narrow by default; broad search can be expensive in large repos.
       broad_search = false,
@@ -41,7 +38,6 @@ return {
     config = function(_, opts)
       vim.lsp.config("roslyn", {
         cmd = { "roslyn-language-server", "--stdio" },
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
         settings = settings,
       })
 

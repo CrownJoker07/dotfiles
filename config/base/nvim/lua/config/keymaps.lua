@@ -4,9 +4,36 @@ local function opts(desc)
   return { desc = desc, silent = true }
 end
 
+local function accept_completion_or(keys)
+  if vim.fn.pumvisible() == 0 then
+    return keys
+  end
+
+  if vim.fn.complete_info({ "selected" }).selected == -1 then
+    return "<C-n><C-y>"
+  end
+
+  return "<C-y>"
+end
+
 -- Save / quit
 map("n", "<leader>w", "<cmd>w<CR>", opts("Save file"))
 map("n", "<leader>q", "<cmd>q<CR>", opts("Quit"))
+
+-- Completion
+map("i", "<Tab>", function()
+  return accept_completion_or("<Tab>")
+end, { desc = "Accept completion", expr = true })
+
+map("i", "<CR>", function()
+  return accept_completion_or("<CR>")
+end, { desc = "Accept completion", expr = true })
+
+map("i", "<C-Space>", function()
+  if vim.lsp.completion then
+    vim.lsp.completion.get()
+  end
+end, opts("Trigger LSP completion"))
 
 -- Open lazygit
 map("n", "<leader>gg", function()
