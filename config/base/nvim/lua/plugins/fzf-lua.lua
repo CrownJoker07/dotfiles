@@ -43,6 +43,13 @@ return {
         desc = "Help tags",
       },
       {
+        "<leader>cs",
+        function()
+          require("fzf-lua").lsp_document_symbols()
+        end,
+        desc = "Document symbols",
+      },
+      {
         "<leader>fs",
         function()
           require("fzf-lua").lsp_document_symbols()
