@@ -27,7 +27,6 @@ opt.completeopt = {
 opt.autoread = true
 opt.termguicolors = true
 opt.signcolumn = "yes"
-opt.showmode = false
 opt.undofile = true
 
 opt.expandtab = true
