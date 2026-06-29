@@ -1,10 +1,3 @@
-vim.g.netrw_banner = 0
-vim.g.netrw_browse_split = 4
-vim.g.netrw_keepdir = 0
-vim.g.netrw_list_hide = [[^\./$,^\../$,^\.git/$]]
-vim.g.netrw_liststyle = 3
-vim.g.netrw_winsize = 28
-
 local function explorer_dir()
   local path = vim.api.nvim_buf_get_name(0)
 
@@ -20,24 +13,27 @@ local function explorer_dir()
   return vim.fn.fnamemodify(path, ":p:h")
 end
 
+local function alternate_buffer()
+  local bufnr = vim.fn.bufnr("#")
+
+  if bufnr > 0 and vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_is_loaded(bufnr) then
+    return bufnr
+  end
+end
+
 vim.keymap.set("n", "<leader>e", function()
   if vim.bo.filetype == "netrw" then
-    vim.cmd("silent! close")
+    local bufnr = alternate_buffer()
+
+    if bufnr then
+      vim.cmd.buffer(bufnr)
+    else
+      vim.cmd.enew()
+    end
+
     return
   end
 
   local dir = explorer_dir()
-  vim.cmd("silent! Lexplore " .. vim.fn.fnameescape(dir))
-end, { desc = "Explorer: Toggle current directory", silent = true })
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "netrw",
-  desc = "Use file-manager style netrw mappings",
-  callback = function(event)
-    local opts = { buffer = event.buf, remap = true, silent = true }
-
-    vim.keymap.set("n", "h", "-", vim.tbl_extend("force", opts, { desc = "netrw: Parent directory" }))
-    vim.keymap.set("n", "l", "<CR>", vim.tbl_extend("force", opts, { desc = "netrw: Open" }))
-    vim.keymap.set("n", "L", "v", vim.tbl_extend("force", opts, { desc = "netrw: Open vertical split" }))
-  end,
-})
+  vim.cmd("Explore " .. vim.fn.fnameescape(dir))
+end, { desc = "Explore current directory", silent = true })
