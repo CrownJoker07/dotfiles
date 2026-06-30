@@ -1,4 +1,5 @@
 local tools = {
+  "clangd",
   "csharpier",
   "prettier",
   "roslyn-language-server",
