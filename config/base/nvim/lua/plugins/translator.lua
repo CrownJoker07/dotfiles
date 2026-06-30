@@ -32,6 +32,63 @@ local function show_translation(text)
   })
 end
 
+local function copy_translation(text)
+  vim.fn.setreg('"', text)
+  vim.fn.setreg("0", text)
+  pcall(vim.fn.setreg, "+", text)
+end
+
+local function get_python()
+  local python = vim.g.python3_host_prog or "python3"
+  if vim.fn.executable(python) == 0 then
+    vim.notify("python3 is required for translation", vim.log.levels.ERROR)
+    return nil
+  end
+  return python
+end
+
+local function get_dict_engines()
+  local engines = vim.g.translator_default_engines or { "bing", "haici" }
+  return vim.tbl_filter(function(engine)
+    return engine ~= "google"
+  end, engines)
+end
+
+local function build_dict_content(payload)
+  local marker = "- "
+  local content = {}
+  local text = payload.text or ""
+
+  if #text > 30 then
+    text = text:sub(1, 30) .. "..."
+  end
+  table.insert(content, ("[ %s ]"):format(text))
+
+  for _, result in ipairs(payload.results or {}) do
+    if result.paraphrase ~= "" or #(result.explains or {}) > 0 then
+      table.insert(content, "")
+      table.insert(content, ("--- %s ---"):format(result.engine or "dict"))
+
+      if result.phonetic and result.phonetic ~= "" then
+        table.insert(content, marker .. "[" .. result.phonetic .. "]")
+      end
+
+      if result.paraphrase and result.paraphrase ~= "" then
+        table.insert(content, marker .. result.paraphrase)
+      end
+
+      for _, explain in ipairs(result.explains or {}) do
+        explain = vim.trim(explain)
+        if explain ~= "" then
+          table.insert(content, marker .. explain)
+        end
+      end
+    end
+  end
+
+  return table.concat(content, "\n")
+end
+
 local function translate_google_text(text)
   text = vim.trim(text or "")
   if text == "" then
@@ -39,9 +96,8 @@ local function translate_google_text(text)
     return
   end
 
-  local python = vim.g.python3_host_prog or "python3"
-  if vim.fn.executable(python) == 0 then
-    vim.notify("python3 is required for Google translation", vim.log.levels.ERROR)
+  local python = get_python()
+  if not python then
     return
   end
 
@@ -99,7 +155,9 @@ print("".join(part[0] for part in payload[0] if part and part[0]))
 
       local translated = vim.trim(result.stdout or "")
       if translated ~= "" then
+        copy_translation(translated)
         show_translation(translated)
+        vim.notify("Translation copied", vim.log.levels.INFO)
       else
         vim.notify("Google returned an empty translation", vim.log.levels.WARN)
       end
@@ -111,6 +169,72 @@ local function translate_google_selection()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "x", false)
   vim.schedule(function()
     translate_google_text(get_visual_text())
+  end)
+end
+
+local function translate_dict_word()
+  local text = vim.trim(vim.fn.expand("<cword>"))
+  if text == "" then
+    vim.notify("No word under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  local python = get_python()
+  if not python then
+    return
+  end
+
+  local engines = get_dict_engines()
+  if #engines == 0 then
+    vim.notify("No non-Google translator engines configured", vim.log.levels.ERROR)
+    return
+  end
+
+  local script = vim.fn.stdpath("data") .. "/lazy/vim-translator/script/translator.py"
+  if vim.fn.filereadable(script) == 0 then
+    vim.notify("vim-translator Python script not found", vim.log.levels.ERROR)
+    return
+  end
+
+  local cmd = {
+    python,
+    script,
+    "--target_lang",
+    vim.g.translator_target_lang or "zh",
+    "--source_lang",
+    vim.g.translator_source_lang or "auto",
+    text,
+    "--engines",
+  }
+  vim.list_extend(cmd, engines)
+
+  vim.notify("Translating...", vim.log.levels.INFO)
+  vim.system(cmd, { text = true }, function(result)
+    vim.schedule(function()
+      if result.code ~= 0 then
+        local message = vim.trim(result.stderr or "")
+        if message == "" then
+          message = "Dictionary translation failed"
+        end
+        vim.notify(message, vim.log.levels.ERROR)
+        return
+      end
+
+      local ok, payload = pcall(vim.json.decode, result.stdout or "")
+      if not ok or type(payload) ~= "table" then
+        vim.notify("Dictionary translation returned invalid data", vim.log.levels.ERROR)
+        return
+      end
+
+      local content = build_dict_content(payload)
+      if content ~= "" then
+        copy_translation(content)
+        show_translation(content)
+        vim.notify("Translation copied", vim.log.levels.INFO)
+      else
+        vim.notify("Dictionary returned an empty translation", vim.log.levels.WARN)
+      end
+    end)
   end)
 end
 
@@ -131,7 +255,7 @@ return {
     keys = {
       {
         "<leader>tw",
-        "<cmd>TranslateW<CR>",
+        translate_dict_word,
         mode = "n",
         desc = "Translate word",
       },
