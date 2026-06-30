@@ -22,6 +22,13 @@ read_package_list() {
   grep -v '^$' "$file" | grep -v '^#' || true
 }
 
+is_in_list() {
+  local needle="$1"
+  local haystack="$2"
+
+  printf '%s\n' "$haystack" | grep -Fxq "$needle"
+}
+
 install_xcode_clt() {
   section "Xcode Command Line Tools"
   if xcode-select -p >/dev/null 2>&1; then
@@ -58,11 +65,14 @@ install_brew_formulae() {
   local formula_list
   formula_list="$(read_package_list macos/brew-formulae.txt)" || return 0
 
+  local installed_formulae
+  installed_formulae="$(brew list --formula)"
+
   local formula
   local missing=()
   while IFS= read -r formula; do
     [ -z "$formula" ] && continue
-    if brew list --formula "$formula" >/dev/null 2>&1; then
+    if is_in_list "$formula" "$installed_formulae"; then
       echo "✓ $formula"
     else
       missing+=("$formula")
@@ -83,11 +93,14 @@ install_brew_casks() {
   local cask_list
   cask_list="$(read_package_list macos/brew-casks.txt)" || return 0
 
+  local installed_casks
+  installed_casks="$(brew list --cask)"
+
   local cask
   local missing=()
   while IFS= read -r cask; do
     [ -z "$cask" ] && continue
-    if brew list --cask "$cask" >/dev/null 2>&1; then
+    if is_in_list "$cask" "$installed_casks"; then
       echo "✓ $cask"
     else
       missing+=("$cask")
