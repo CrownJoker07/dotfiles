@@ -1,3 +1,7 @@
+local function no_preview()
+  return { previewer = false }
+end
+
 return {
   {
     "ibhagwan/fzf-lua",
@@ -9,57 +13,49 @@ return {
       {
         "<leader>ff",
         function()
-          -- File search is usually faster without a preview window.
-          require("fzf-lua").files({ previewer = false })
+          require("fzf-lua").files(no_preview())
         end,
         desc = "Find files",
       },
       {
         "<leader>fg",
         function()
-          require("fzf-lua").live_grep()
+          require("fzf-lua").live_grep(no_preview())
         end,
         desc = "Live grep",
       },
       {
         "<leader>fb",
         function()
-          require("fzf-lua").buffers()
+          require("fzf-lua").buffers(no_preview())
         end,
         desc = "Find buffers",
       },
       {
         "<leader>fr",
         function()
-          require("fzf-lua").oldfiles()
+          require("fzf-lua").oldfiles(no_preview())
         end,
         desc = "Recent files",
       },
       {
         "<leader>fh",
         function()
-          require("fzf-lua").helptags()
+          require("fzf-lua").helptags(no_preview())
         end,
         desc = "Help tags",
       },
       {
-        "<leader>cs",
-        function()
-          require("fzf-lua").lsp_document_symbols()
-        end,
-        desc = "Document symbols",
-      },
-      {
         "<leader>fs",
         function()
-          require("fzf-lua").lsp_document_symbols()
+          require("fzf-lua").lsp_document_symbols(no_preview())
         end,
         desc = "Document symbols",
       },
       {
         "<leader>fS",
         function()
-          require("fzf-lua").lsp_workspace_symbols()
+          require("fzf-lua").lsp_workspace_symbols(no_preview())
         end,
         desc = "Workspace symbols",
       },
@@ -68,10 +64,6 @@ return {
       fzf_colors = true,
       winopts = {
         fullscreen = true,
-        preview = {
-          horizontal = "right:40%",
-          vertical = "down:35%",
-        },
       },
       defaults = {
         formatter = "path.filename_first",
