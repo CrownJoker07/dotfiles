@@ -10,8 +10,8 @@ package names, paths, and desktop behavior.
 - `home/base/`: home-directory dotfiles shared by macOS and Linux.
 - `config/macos/` and `home/macos/`: macOS-only overrides.
 - `config/linux/` and `home/linux/`: Linux-only overrides.
-- `packages/macos/`: Homebrew formula and cask snapshots.
-- `packages/arch/`: Arch pacman, archlinuxcn, and AUR package snapshots.
+- `packages/packages.conf`: package manifest for macOS Homebrew formulae/casks
+  and Arch pacman, archlinuxcn, and AUR packages.
 - `scripts/`: installer and symlink logic.
 
 ## Cross-Platform Rules
@@ -32,7 +32,7 @@ package names, paths, and desktop behavior.
 - Prefer package-managed binary installs: Homebrew on macOS, official `pacman`
   repositories on Arch, and the configured `archlinuxcn` binary repository for
   packages that are not in official Arch repositories.
-- Keep package list files as the source of truth for ordinary packages. Do not
+- Keep `packages/packages.conf` as the source of truth for ordinary packages. Do not
   add package-specific install, reinstall, or filesystem validation functions
   to installer scripts when the package can be listed under `packages/`.
   Bootstrap steps such as Xcode Command Line Tools, Homebrew installation, and
@@ -42,9 +42,9 @@ package names, paths, and desktop behavior.
   `yay` through `archlinuxcn` when possible.
 - Do not add Flatpak support to the Linux installer. Prefer `pacman`,
   `archlinuxcn`, then AUR helper packages.
-- Before adding a package to `aur.txt`, verify it is not already available
-  in the official `pacman` or `archlinuxcn` repositories. Use the pacman
-  equivalent when available.
+- Before adding a package under `arch.aur` in `packages/packages.conf`, verify it
+  is not already available in the official `pacman` or `archlinuxcn`
+  repositories. Use the package-managed equivalent when available.
 - Homebrew formula installs should use bottles and avoid source fallback.
 - Neovim plugins and plugin-side Lua package metadata are managed by
   `lazy.nvim`. Keep lazy package sources enabled, including `rockspec`/rocks,
@@ -65,6 +65,7 @@ Run these checks after modifying installer scripts or package lists:
 
 ```sh
 bash -n install.sh scripts/install-arch.sh scripts/install-macos.sh scripts/symlink.sh
+awk 'NF && $0 !~ /^#/ && $0 !~ /^\[[^]]+\]( # .*)?$/ && $0 !~ /^[a-z]+\.[a-z]+ = / { print FNR ": " $0; bad=1 } END { exit bad }' packages/packages.conf
 ! rg -n "makepkg|git clone https://aur.archlinux.org|base-devel|build-from-source|cargo install|go install|pip install|flatpak" scripts packages
 ./install.sh -d
 ```

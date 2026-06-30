@@ -15,16 +15,39 @@ fi
 
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 PACKAGE_DIR="$DOTFILES_DIR/packages"
+PACKAGE_FILE="$PACKAGE_DIR/packages.conf"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
 read_package_list() {
-  local file="$PACKAGE_DIR/$1"
-  if [ ! -f "$file" ] || [ ! -s "$file" ]; then
-    echo "⊘ skip: packages/$1 not found or empty" >&2
+  local selector="$1"
+
+  if [ ! -f "$PACKAGE_FILE" ] || [ ! -s "$PACKAGE_FILE" ]; then
+    echo "⊘ skip: packages/packages.conf not found or empty" >&2
     return 1
   fi
-  grep -v '^$' "$file" | grep -v '^#' || true
+
+  awk -v selector="$selector" '
+    /^[[:space:]]*($|#)/ { next }
+    /^[[:space:]]*\[/ { next }
+    {
+      line = $0
+      sub(/[[:space:]]+#.*$/, "", line)
+      key = line
+      value = line
+      sub(/=.*/, "", key)
+      sub(/^[^=]*=/, "", value)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+
+      if (key == selector && value != "") {
+        count = split(value, packages, /[[:space:]]+/)
+        for (i = 1; i <= count; i++) {
+          if (packages[i] != "") print packages[i]
+        }
+      }
+    }
+  ' "$PACKAGE_FILE" | sort -u
 }
 
 ensure_archlinuxcn_repo() {
@@ -49,7 +72,7 @@ install_pacman_packages() {
   section "pacman packages"
 
   local packages_str
-  packages_str="$(read_package_list arch/pacman.txt)" || return 0
+  packages_str="$(read_package_list arch.pacman)" || return 0
 
   local packages=()
   local entry
@@ -89,7 +112,7 @@ install_archlinuxcn_packages() {
   section "archlinuxcn packages"
 
   local packages_str
-  packages_str="$(read_package_list arch/archlinuxcn.txt)" || return 0
+  packages_str="$(read_package_list arch.archlinuxcn)" || return 0
 
   local packages=()
   local entry
@@ -126,7 +149,7 @@ install_aur_packages() {
   section "AUR packages"
 
   local packages_str
-  packages_str="$(read_package_list arch/aur.txt)" || return 0
+  packages_str="$(read_package_list arch.aur)" || return 0
 
   local aur_helper=""
   if command -v paru >/dev/null 2>&1; then

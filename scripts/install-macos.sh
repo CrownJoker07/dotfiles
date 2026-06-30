@@ -10,16 +10,39 @@ fi
 
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 PACKAGE_DIR="$DOTFILES_DIR/packages"
+PACKAGE_FILE="$PACKAGE_DIR/packages.conf"
 
 section() { echo; echo "━━━ $1 ━━━"; }
 
 read_package_list() {
-  local file="$PACKAGE_DIR/$1"
-  if [ ! -f "$file" ] || [ ! -s "$file" ]; then
-    echo "⊘ skip: packages/$1 not found or empty" >&2
+  local selector="$1"
+
+  if [ ! -f "$PACKAGE_FILE" ] || [ ! -s "$PACKAGE_FILE" ]; then
+    echo "⊘ skip: packages/packages.conf not found or empty" >&2
     return 1
   fi
-  grep -v '^$' "$file" | grep -v '^#' || true
+
+  awk -v selector="$selector" '
+    /^[[:space:]]*($|#)/ { next }
+    /^[[:space:]]*\[/ { next }
+    {
+      line = $0
+      sub(/[[:space:]]+#.*$/, "", line)
+      key = line
+      value = line
+      sub(/=.*/, "", key)
+      sub(/^[^=]*=/, "", value)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+
+      if (key == selector && value != "") {
+        count = split(value, packages, /[[:space:]]+/)
+        for (i = 1; i <= count; i++) {
+          if (packages[i] != "") print packages[i]
+        }
+      }
+    }
+  ' "$PACKAGE_FILE" | sort -u
 }
 
 is_in_list() {
@@ -63,7 +86,7 @@ install_brew_formulae() {
   section "Homebrew formulae"
 
   local formula_list
-  formula_list="$(read_package_list macos/brew-formulae.txt)" || return 0
+  formula_list="$(read_package_list macos.formula)" || return 0
 
   local installed_formulae
   installed_formulae="$(brew list --formula)"
@@ -91,7 +114,7 @@ install_brew_casks() {
   section "Homebrew casks"
 
   local cask_list
-  cask_list="$(read_package_list macos/brew-casks.txt)" || return 0
+  cask_list="$(read_package_list macos.cask)" || return 0
 
   local installed_casks
   installed_casks="$(brew list --cask)"
