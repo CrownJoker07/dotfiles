@@ -49,6 +49,14 @@ package names, paths, and desktop behavior.
 - Neovim plugins and plugin-side Lua package metadata are managed by
   `lazy.nvim`. Keep lazy package sources enabled, including `rockspec`/rocks,
   unless a concrete plugin compatibility issue requires a local override.
+- Neovim files under `config/base/nvim/lua/plugins/` should be lazy.nvim plugin
+  specs and named after the plugin they configure. Put editor behavior that is
+  not itself a plugin, such as native LSP server setup, under
+  `config/base/nvim/lua/config/`.
+- Native Neovim LSP server setup lives under
+  `config/base/nvim/lua/config/lsp/`. Keep `config/lsp/init.lua` as the small
+  registry and put each server in its own file named after the server, such as
+  `clangd.lua` or `roslyn.lua`.
 - Neovim editor tools are managed by Mason. Do not duplicate Mason-managed LSP
   servers, formatters, or parser tooling in system package lists unless there
   is a clear reason. This includes `tree-sitter-cli`, `shfmt`, and `stylua`.
