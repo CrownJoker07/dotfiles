@@ -21,10 +21,11 @@ local function get_visual_text()
     lines[#lines] = lines[#lines]:sub(1, end_col)
   end
 
-  return vim.trim(table.concat(lines, " "))
+  return vim.trim(table.concat(lines, "\n"))
 end
 
-local function show_translation(lines)
+local function show_translation(text)
+  local lines = vim.split(text, "\n", { plain = true })
   vim.lsp.util.open_floating_preview(lines, "text", {
     border = "rounded",
     max_width = 80,
@@ -48,27 +49,44 @@ local function translate_google_text(text)
 
   local script = [[
 import json
+import socket
 import sys
 import urllib.parse
+import urllib.error
 import urllib.request
 
-source_lang, target_lang, text = sys.argv[1], sys.argv[2], sys.argv[3]
+source_lang, target_lang = sys.argv[1], sys.argv[2]
+text = sys.stdin.read()
 # Request only the main translation. vim-translator's Google alternative parser
 # can crash on some multi-line selections because Google returns sparse entries.
-query = urllib.parse.urlencode({
+data = urllib.parse.urlencode({
     "client": "gtx",
     "sl": source_lang,
     "tl": target_lang,
     "dt": "t",
     "q": text,
-})
-url = "https://translate.googleapis.com/translate_a/single?" + query
-with urllib.request.urlopen(url, timeout=5) as response:
-    payload = json.loads(response.read().decode("utf-8"))
+}).encode("utf-8")
+request = urllib.request.Request(
+    "https://translate.googleapis.com/translate_a/single",
+    data=data,
+    headers={"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"},
+    method="POST",
+)
+try:
+    with urllib.request.urlopen(request, timeout=8) as response:
+        payload = json.loads(response.read().decode("utf-8"))
+except urllib.error.URLError as exc:
+    reason = getattr(exc, "reason", exc)
+    print(f"Google translation failed: {reason}", file=sys.stderr)
+    raise SystemExit(1)
+except (TimeoutError, socket.timeout):
+    print("Google translation failed: request timed out", file=sys.stderr)
+    raise SystemExit(1)
+
 print("".join(part[0] for part in payload[0] if part and part[0]))
 ]]
 
-  vim.system({ python, "-c", script, "auto", vim.g.translator_target_lang or "zh", text }, { text = true }, function(result)
+  vim.system({ python, "-c", script, "auto", vim.g.translator_target_lang or "zh" }, { text = true, stdin = text }, function(result)
     vim.schedule(function()
       if result.code ~= 0 then
         local message = vim.trim(result.stderr or "")
@@ -81,7 +99,7 @@ print("".join(part[0] for part in payload[0] if part and part[0]))
 
       local translated = vim.trim(result.stdout or "")
       if translated ~= "" then
-        show_translation({ translated })
+        show_translation(translated)
       else
         vim.notify("Google returned an empty translation", vim.log.levels.WARN)
       end
