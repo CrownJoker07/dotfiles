@@ -92,6 +92,8 @@ if is_mac then
 	config.macos_window_background_blur = 20
 	config.send_composed_key_when_left_alt_is_pressed = false
 	config.send_composed_key_when_right_alt_is_pressed = false
+else
+	config.enable_wayland = false
 end
 
 -- ==================== Scrollback ====================
