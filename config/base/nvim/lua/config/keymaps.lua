@@ -75,3 +75,17 @@ map("n", "<leader>oi", function()
 
   vim.ui.open(path)
 end, opts("Open current file with system viewer"))
+
+-- Open current buffer directory with system file manager
+map("n", "<leader>od", function()
+  local path = vim.api.nvim_buf_get_name(0)
+  if path == "" then
+    vim.notify("Current buffer has no file", vim.log.levels.ERROR)
+    return
+  end
+
+  local stat = vim.uv.fs_stat(path)
+  local dir = stat and stat.type == "directory" and path or vim.fn.fnamemodify(path, ":p:h")
+
+  vim.ui.open(dir)
+end, opts("Open current buffer directory with system file manager"))
