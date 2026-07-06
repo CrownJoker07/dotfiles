@@ -1,4 +1,5 @@
 local tools = {
+  "bash-language-server",
   "clangd",
   "csharpier",
   "prettier",
