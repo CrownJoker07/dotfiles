@@ -47,6 +47,24 @@ map("n", "<leader>gg", function()
   vim.cmd("startinsert")
 end, opts("Open Lazygit"))
 
+-- Open current file history in lazygit
+map("n", "<leader>gh", function()
+  if vim.fn.executable("lazygit") == 0 then
+    vim.notify("lazygit is not installed", vim.log.levels.ERROR)
+    return
+  end
+
+  local path = vim.fn.expand("%:p")
+  if path == "" then
+    vim.notify("Current buffer has no file", vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd("tabnew")
+  vim.cmd("terminal lazygit --filter " .. vim.fn.shellescape(path))
+  vim.cmd("startinsert")
+end, opts("Open current file history in Lazygit"))
+
 -- Open git remote repository
 map("n", "<leader>go", function()
   local result = vim.system({ "git", "remote", "get-url", "origin" }, { text = true }):wait()
