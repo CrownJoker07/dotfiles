@@ -71,6 +71,17 @@ install_homebrew() {
     echo "✓ already installed: $(brew --prefix)"
     return
   fi
+
+  if [ -f /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    echo "✓ already installed: $(brew --prefix)"
+    return
+  elif [ -f /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+    echo "✓ already installed: $(brew --prefix)"
+    return
+  fi
+
   echo "→ installing..."
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
