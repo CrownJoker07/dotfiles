@@ -15,12 +15,6 @@ path_prepend "$HOME/.local/bin"          # user-local binaries
 eval "$(/opt/homebrew/bin/brew shellenv)" # initialize Homebrew
 fpath+=("/opt/homebrew/share/zsh/site-functions")     # Homebrew zsh completions
 
-# Detect Java home via macOS system utility
-if [[ -x /usr/libexec/java_home ]]; then
-  macos_java_home="$(/usr/libexec/java_home 2>/dev/null || true)"
-  [[ -n "$macos_java_home" ]] && export JAVA_HOME="$macos_java_home"
-fi
-
 # Source user-defined local environment script
 if [[ -r "$HOME/.local/bin/env" ]]; then
   source "$HOME/.local/bin/env"
@@ -41,5 +35,4 @@ fi
 
 # Clean up temporary variables and helper functions
 unset current_zshrc
-unset macos_java_home
 unfunction path_prepend
