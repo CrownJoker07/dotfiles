@@ -20,7 +20,7 @@ return {
       {
         "<leader>fg",
         function()
-          require("fzf-lua").live_grep(no_preview())
+          require("fzf-lua").live_grep({ previewer = false, hidden = true })
         end,
         desc = "Live grep",
       },
