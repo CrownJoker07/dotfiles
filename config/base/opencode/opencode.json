@@ -17,7 +17,7 @@
       "name": "Alibaba Cloud Model Studio",
       "options": {
         "baseURL": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
-        "apiKey": "{env:OPENCODE_API_KEY}"
+        "apiKey": "{env:ALIBABA_BAILIAN_CODING_PLAN_API_KEY}"
       },
       "models": {
         "qwen3.7-plus": {
