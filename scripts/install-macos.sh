@@ -11,8 +11,22 @@ fi
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 PACKAGE_DIR="$DOTFILES_DIR/packages"
 PACKAGE_FILE="$PACKAGE_DIR/packages.conf"
+FAILED_STEPS=()
 
 section() { echo; echo "━━━ $1 ━━━"; }
+
+run_step() {
+  local name="$1"
+  shift
+
+  if "$@"; then
+    return 0
+  fi
+
+  echo "✗ failed: $name"
+  FAILED_STEPS+=("$name")
+  return 0
+}
 
 read_package_list() {
   local selector="$1"
@@ -59,7 +73,7 @@ install_xcode_clt() {
     return
   fi
   echo "→ installing (a dialog will appear)..."
-  xcode-select --install
+  xcode-select --install || return
   echo "  waiting for installation to complete..."
   until xcode-select -p >/dev/null 2>&1; do sleep 5; done
   echo "✓ installed"
@@ -67,40 +81,57 @@ install_xcode_clt() {
 
 install_homebrew() {
   section "Homebrew"
+  local brew_prefix
+
   if command -v brew >/dev/null 2>&1; then
-    echo "✓ already installed: $(brew --prefix)"
+    brew_prefix="$(brew --prefix)" || return
+    echo "✓ already installed: $brew_prefix"
     return
   fi
 
   if [ -f /opt/homebrew/bin/brew ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    echo "✓ already installed: $(brew --prefix)"
+    eval "$(/opt/homebrew/bin/brew shellenv)" || return
+    brew_prefix="$(brew --prefix)" || return
+    echo "✓ already installed: $brew_prefix"
     return
   elif [ -f /usr/local/bin/brew ]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-    echo "✓ already installed: $(brew --prefix)"
+    eval "$(/usr/local/bin/brew shellenv)" || return
+    brew_prefix="$(brew --prefix)" || return
+    echo "✓ already installed: $brew_prefix"
     return
   fi
 
   echo "→ installing..."
-  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  local installer
+  installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || return
+  NONINTERACTIVE=1 /bin/bash -c "$installer" || return
 
   if [ -f /opt/homebrew/bin/brew ]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    eval "$(/opt/homebrew/bin/brew shellenv)" || return
   elif [ -f /usr/local/bin/brew ]; then
-    eval "$(/usr/local/bin/brew shellenv)"
+    eval "$(/usr/local/bin/brew shellenv)" || return
+  else
+    echo "✗ brew installed but executable not found"
+    return 1
   fi
-  echo "✓ installed: $(brew --prefix)"
+
+  brew_prefix="$(brew --prefix)" || return
+  echo "✓ installed: $brew_prefix"
 }
 
 install_brew_formulae() {
   section "Homebrew formulae"
 
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "⊘ skip: brew not found"
+    return 0
+  fi
+
   local formula_list
   formula_list="$(read_package_list macos.formula)" || return 0
 
   local installed_formulae
-  installed_formulae="$(brew list --formula)"
+  installed_formulae="$(brew list --formula)" || return
 
   local formula
   local missing=()
@@ -115,7 +146,7 @@ install_brew_formulae() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} formula(e) from bottles: ${missing[*]}"
-    brew install --force-bottle "${missing[@]}"
+    brew install --force-bottle "${missing[@]}" || return
   fi
 
   echo "✓ brew formulae ready"
@@ -124,11 +155,16 @@ install_brew_formulae() {
 install_brew_casks() {
   section "Homebrew casks"
 
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "⊘ skip: brew not found"
+    return 0
+  fi
+
   local cask_list
   cask_list="$(read_package_list macos.cask)" || return 0
 
   local installed_casks
-  installed_casks="$(brew list --cask)"
+  installed_casks="$(brew list --cask)" || return
 
   local cask
   local missing=()
@@ -143,7 +179,7 @@ install_brew_casks() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} cask(s): ${missing[*]}"
-    brew install --cask "${missing[@]}"
+    brew install --cask "${missing[@]}" || return
   fi
 
   echo "✓ brew casks ready"
@@ -152,9 +188,14 @@ install_brew_casks() {
 install_tmux_plugins() {
   section "tmux plugins"
 
-  local brew_prefix
-  brew_prefix="$(brew --prefix)"
-  local tpm_path="$brew_prefix/share/tpm"
+  local tpm_path=""
+
+  if command -v brew >/dev/null 2>&1; then
+    local brew_prefix
+    if brew_prefix="$(brew --prefix)"; then
+      tpm_path="$brew_prefix/share/tpm"
+    fi
+  fi
 
   if [ ! -f "$tpm_path/tpm" ] && [ -f "$HOME/.tmux/plugins/tpm/tpm" ]; then
     tpm_path="$HOME/.tmux/plugins/tpm"
@@ -167,12 +208,12 @@ install_tmux_plugins() {
 
   echo "→ installing plugins via tpm ($tpm_path)..."
   local session_name="_tpm_install_$$"
-  tmux start-server
+  tmux start-server || return
   tmux new-session -d -s "$session_name" 2>/dev/null || true
   tmux source-file "$HOME/.tmux.conf" 2>/dev/null || true
   export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins/"
-  tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGIN_MANAGER_PATH"
-  "$tpm_path/bin/install_plugins"
+  tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$TMUX_PLUGIN_MANAGER_PATH" || return
+  "$tpm_path/bin/install_plugins" || return
   tmux kill-session -t "$session_name" 2>/dev/null || true
   echo "✓ tmux plugins installed"
 }
@@ -186,7 +227,7 @@ install_mise_tools() {
   fi
 
   echo "→ installing tools from ~/.config/mise/config.toml..."
-  mise install
+  mise install || return
   echo "✓ mise tools ready"
 }
 
@@ -199,10 +240,21 @@ print_summary() {
 EOF
 }
 
-install_xcode_clt
-install_homebrew
-install_brew_formulae
-install_brew_casks
-install_tmux_plugins
-install_mise_tools
+print_failures() {
+  if [ "${#FAILED_STEPS[@]}" -eq 0 ]; then
+    return 0
+  fi
+
+  section "Failed steps"
+  printf '✗ %s\n' "${FAILED_STEPS[@]}"
+  return 1
+}
+
+run_step "Xcode Command Line Tools" install_xcode_clt
+run_step "Homebrew" install_homebrew
+run_step "Homebrew formulae" install_brew_formulae
+run_step "Homebrew casks" install_brew_casks
+run_step "tmux plugins" install_tmux_plugins
+run_step "mise dev tools" install_mise_tools
 print_summary
+print_failures

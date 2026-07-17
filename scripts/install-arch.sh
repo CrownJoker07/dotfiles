@@ -16,8 +16,22 @@ fi
 DOTFILES_DIR="${DOTFILES_DIR:-$(cd "$(dirname "$0")/.." && pwd)}"
 PACKAGE_DIR="$DOTFILES_DIR/packages"
 PACKAGE_FILE="$PACKAGE_DIR/packages.conf"
+FAILED_STEPS=()
 
 section() { echo; echo "━━━ $1 ━━━"; }
+
+run_step() {
+  local name="$1"
+  shift
+
+  if "$@"; then
+    return 0
+  fi
+
+  echo "✗ failed: $name"
+  FAILED_STEPS+=("$name")
+  return 0
+}
 
 read_package_list() {
   local selector="$1"
@@ -59,12 +73,12 @@ ensure_archlinuxcn_repo() {
     echo "✓ already configured"
   else
     echo "→ enabling archlinuxcn in $pacman_conf..."
-    printf '\n# dotfiles: archlinuxcn repository\n[archlinuxcn]\nServer = https://repo.archlinuxcn.org/$arch\n' | sudo tee -a "$pacman_conf" >/dev/null
+    printf '\n# dotfiles: archlinuxcn repository\n[archlinuxcn]\nServer = https://repo.archlinuxcn.org/$arch\n' | sudo tee -a "$pacman_conf" >/dev/null || return
     echo "✓ repository added"
   fi
 
   echo "→ installing archlinuxcn keyring..."
-  sudo pacman -Syu --needed --noconfirm archlinuxcn-keyring
+  sudo pacman -Syu --needed --noconfirm archlinuxcn-keyring || return
   echo "✓ archlinuxcn ready"
 }
 
@@ -102,7 +116,7 @@ install_pacman_packages() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} package(s): ${missing[*]}"
-    sudo pacman -S --needed --noconfirm "${missing[@]}"
+    sudo pacman -S --needed --noconfirm "${missing[@]}" || return
   fi
 
   echo "✓ pacman packages ready (${#packages[@]} total)"
@@ -139,7 +153,7 @@ install_archlinuxcn_packages() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} archlinuxcn package(s): ${missing[*]}"
-    sudo pacman -S --needed --noconfirm "${missing[@]}"
+    sudo pacman -S --needed --noconfirm "${missing[@]}" || return
   fi
 
   echo "✓ archlinuxcn packages ready (${#packages[@]} total)"
@@ -191,7 +205,7 @@ install_aur_packages() {
 
   if [ "${#missing[@]}" -gt 0 ]; then
     echo "→ installing ${#missing[@]} AUR package(s): ${missing[*]}"
-    "$aur_helper" -S --needed --noconfirm "${missing[@]}"
+    "$aur_helper" -S --needed --noconfirm "${missing[@]}" || return
   fi
 
   echo "✓ AUR packages ready (${#packages[@]} total)"
@@ -206,7 +220,7 @@ configure_zsh() {
   fi
 
   echo "→ changing default shell to zsh..."
-  chsh -s /usr/bin/zsh
+  chsh -s /usr/bin/zsh || return
   echo "✓ switched (restart session to apply)"
 }
 
@@ -224,11 +238,11 @@ install_tmux_plugins() {
 
   echo "→ installing plugins via tpm ($tpm_path)..."
   local session_name="_tpm_install_$$"
-  tmux start-server
+  tmux start-server || return
   tmux new-session -d -s "$session_name" 2>/dev/null || true
   tmux source-file "$HOME/.tmux.conf" 2>/dev/null || true
   export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins/"
-  "$tpm_path/bin/install_plugins"
+  "$tpm_path/bin/install_plugins" || return
   tmux kill-session -t "$session_name" 2>/dev/null || true
   echo "✓ tmux plugins installed"
 }
@@ -242,7 +256,7 @@ install_mise_tools() {
   fi
 
   echo "→ installing tools from ~/.config/mise/config.toml..."
-  mise install
+  mise install || return
   echo "✓ mise tools ready"
 }
 
@@ -262,11 +276,22 @@ print_summary() {
 EOF
 }
 
-ensure_archlinuxcn_repo
-install_archlinuxcn_packages
-install_pacman_packages
-install_aur_packages
-install_tmux_plugins
-install_mise_tools
-configure_zsh
+print_failures() {
+  if [ "${#FAILED_STEPS[@]}" -eq 0 ]; then
+    return 0
+  fi
+
+  section "Failed steps"
+  printf '✗ %s\n' "${FAILED_STEPS[@]}"
+  return 1
+}
+
+run_step "archlinuxcn repository" ensure_archlinuxcn_repo
+run_step "archlinuxcn packages" install_archlinuxcn_packages
+run_step "pacman packages" install_pacman_packages
+run_step "AUR packages" install_aur_packages
+run_step "tmux plugins" install_tmux_plugins
+run_step "mise dev tools" install_mise_tools
+run_step "Default shell" configure_zsh
 print_summary
+print_failures

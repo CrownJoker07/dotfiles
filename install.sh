@@ -20,15 +20,22 @@ echo
 
 "$DOTFILES_DIR/scripts/symlink.sh" "$@"
 
+INSTALL_STATUS=0
 if [ "$DRY_RUN" = true ]; then
   echo "⊘ dry-run: skip package installers"
 else
   case "$(uname -s)" in
-    Darwin) "$DOTFILES_DIR/scripts/install-macos.sh" ;;
-    Linux) "$DOTFILES_DIR/scripts/install-arch.sh" ;;
+    Darwin) "$DOTFILES_DIR/scripts/install-macos.sh" || INSTALL_STATUS=$? ;;
+    Linux) "$DOTFILES_DIR/scripts/install-arch.sh" || INSTALL_STATUS=$? ;;
     *) echo "⊘ skip package installers: unsupported OS $(uname -s)" ;;
   esac
 fi
 
 echo
-echo "Done."
+if [ "$INSTALL_STATUS" -eq 0 ]; then
+  echo "Done."
+else
+  echo "Done with package installer errors."
+fi
+
+exit "$INSTALL_STATUS"
