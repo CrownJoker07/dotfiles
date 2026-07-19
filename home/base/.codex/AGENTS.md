@@ -2,6 +2,12 @@
 
 ## Coding Rules
 
+### Dependency Installation
+
+- Never install dependencies or developer tools globally, system-wide, or into a user-wide environment. This includes commands such as `pip install --user`, global `pip install`, `npm install -g`, `cargo install`, `go install`, and `gem install`.
+- Ask the user for explicit permission before running any command that installs or updates dependencies or developer tools.
+- Install project dependencies only through the project's existing package manager and project-local isolated environment. For Python, use the project's `.venv`; never install into the system or user Python environment.
+
 ### Keep Scope Minimal
 
 - Implement only what the user explicitly requested.
