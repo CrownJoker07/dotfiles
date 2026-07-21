@@ -6,7 +6,6 @@ return {
     cmd = {
       "roslyn-language-server",
       "--stdio",
-      "--autoLoadProjects",
     },
     cmd_env = {
       Configuration = vim.env.Configuration or "Debug",
@@ -26,6 +25,16 @@ return {
 
       if root then
         on_dir(root)
+      end
+    end,
+    on_init = function(client)
+      for entry, type in vim.fs.dir(client.config.root_dir) do
+        if type == "file" and entry:match("%.slnx?$") then
+          client:notify("solution/open", {
+            solution = vim.uri_from_fname(vim.fs.joinpath(client.config.root_dir, entry)),
+          })
+          return
+        end
       end
     end,
     settings = {
