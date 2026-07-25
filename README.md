@@ -70,6 +70,20 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
+默认情况下，如果目标位置已经存在普通文件，安装程序会跳过该文件，不会覆盖。要备份现有文件并强制替换为仓库中的符号链接，使用 `-Force` 或缩写 `-f`：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -Force
+```
+
+也可以先预览强制替换会执行的备份和链接操作：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun -Force
+```
+
+`-Force` 不会直接删除原文件，而是先在原位置创建带时间戳的 `.bak` 备份。
+
 安装程序会依次：
 
 1. 将共享配置链接到 `$HOME\.config` 和用户主目录。
