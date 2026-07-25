@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local is_mac = wezterm.target_triple:find("darwin") ~= nil
+local is_linux = wezterm.target_triple:find("linux") ~= nil
 
 -- ==================== Font ====================
 config.font = wezterm.font("JetBrainsMono Nerd Font")
@@ -92,7 +93,7 @@ if is_mac then
 	config.macos_window_background_blur = 20
 	config.send_composed_key_when_left_alt_is_pressed = false
 	config.send_composed_key_when_right_alt_is_pressed = false
-else
+elseif is_linux then
 	config.enable_wayland = false
 end
 
@@ -108,7 +109,7 @@ config.use_fancy_tab_bar = false
 -- ==================== Shell ====================
 if is_mac then
 	config.default_prog = { "/bin/zsh" }
-else
+elseif is_linux then
 	config.default_prog = { "/usr/bin/zsh" }
 end
 

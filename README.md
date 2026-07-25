@@ -75,6 +75,8 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 1. 将共享配置链接到 `$HOME\.config` 和用户主目录。
 2. 应用 `config/windows` 和 `home/windows` 中存在的 Windows 专属覆盖。
 3. 使用 `winget` 安装 `packages/packages.conf` 中的 Windows 软件。
+4. 使用 mise 安装共享配置中声明的 Python、Node.js、Java 和 .NET。
+5. 通过 PowerShell profile 激活 mise、zoxide 和 Starship。
 
 如果当前终端使用 PowerShell 7，也可以将命令中的 `powershell` 换成 `pwsh`。
 

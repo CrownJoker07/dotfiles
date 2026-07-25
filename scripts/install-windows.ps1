@@ -32,7 +32,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Failed to read installed packages from winget."
 }
 
-$failed = @()
+$failedPackages = @()
 foreach ($package in $packages) {
     $packagePattern = "(?m)(^|\s)$([Regex]::Escape($package))(\s|$)"
     if ($installedPackages -match $packagePattern) {
@@ -44,15 +44,44 @@ foreach ($package in $packages) {
     & winget install --id $package --exact --no-upgrade --accept-package-agreements --accept-source-agreements
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED: $package"
-        $failed += $package
+        $failedPackages += $package
     }
 }
 
-if ($failed.Count -gt 0) {
+$miseCommand = (Get-Command mise -ErrorAction SilentlyContinue).Source
+if (-not $miseCommand) {
+    $misePath = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Links\mise.exe"
+    if (Test-Path -LiteralPath $misePath -PathType Leaf) {
+        $miseCommand = $misePath
+    }
+}
+
+Write-Host
+Write-Host "=== mise dev tools ==="
+
+$miseFailed = $false
+if (-not $miseCommand) {
+    Write-Host "- skip: mise not found"
+} else {
+    Write-Host "Installing tools from ~/.config/mise/config.toml"
+    & $miseCommand install
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "FAILED: mise dev tools"
+        $miseFailed = $true
+    } else {
+        Write-Host "OK: mise dev tools ready"
+    }
+}
+
+if ($failedPackages.Count -gt 0) {
     Write-Host
-    Write-Host "Failed packages: $($failed -join ', ')"
+    Write-Host "Failed packages: $($failedPackages -join ', ')"
+}
+
+if ($failedPackages.Count -gt 0 -or $miseFailed) {
     exit 1
 }
 
-Write-Host "OK: winget packages ready ($($packages.Count) total)"
+Write-Host
+Write-Host "OK: Windows setup complete"
 exit 0
