@@ -1,6 +1,11 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazyinit = lazypath .. "/lua/lazy/init.lua"
 
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not (vim.uv or vim.loop).fs_stat(lazyinit) then
+  if (vim.uv or vim.loop).fs_stat(lazypath) then
+    vim.fn.delete(lazypath, "rf")
+  end
+
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({
     "git",
