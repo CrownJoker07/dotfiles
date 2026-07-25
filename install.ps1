@@ -29,7 +29,7 @@ Write-Host
     -Force:$Force
 
 if ($DryRun) {
-    Write-Host "⊘ dry-run: skip package installer"
+    Write-Host "- dry-run: skip package installer"
 } else {
     & (Join-Path $dotfilesDir "scripts/install-windows.ps1") -DotfilesDir $dotfilesDir
     if ($LASTEXITCODE -ne 0) {

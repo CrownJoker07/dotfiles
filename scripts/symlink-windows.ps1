@@ -17,7 +17,7 @@ $dotfilesRoot = [System.IO.Path]::GetFullPath($DotfilesDir).TrimEnd("\", "/")
 
 function Write-Section([string]$Name) {
     Write-Host
-    Write-Host "━━━ $Name ━━━"
+    Write-Host "=== $Name ==="
 }
 
 function Test-RepoTarget([string]$Target) {
@@ -34,7 +34,7 @@ function Test-RepoTarget([string]$Target) {
 
 function New-DotfileLink([string]$Source, [string]$Destination) {
     if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
-        Write-Host "⊘ skip (not found): $Source"
+        Write-Host "- skip (not found): $Source"
         return
     }
 
@@ -48,17 +48,17 @@ function New-DotfileLink([string]$Source, [string]$Destination) {
         }
 
         if ([System.IO.Path]::GetFullPath($resolvedTarget) -eq [System.IO.Path]::GetFullPath($Source)) {
-            Write-Host "✓ already linked: $Destination"
+            Write-Host "OK: already linked: $Destination"
             return
         }
 
         if ((Test-RepoTarget $resolvedTarget) -and (Test-RepoTarget $Source)) {
             if ($DryRun) {
-                Write-Host "↻ would relink: $Destination -> $Source"
+                Write-Host "Would relink: $Destination -> $Source"
             } else {
                 Remove-Item -LiteralPath $Destination
                 New-Item -ItemType SymbolicLink -Path $Destination -Target $Source | Out-Null
-                Write-Host "↻ relinked: $Destination -> $Source"
+                Write-Host "Relinked: $Destination -> $Source"
             }
             return
         }
@@ -66,16 +66,16 @@ function New-DotfileLink([string]$Source, [string]$Destination) {
 
     if ($existing) {
         if (-not $Force) {
-            Write-Host "⊘ exists, skip: $Destination (use -Force to backup)"
+            Write-Host "- exists, skip: $Destination (use -Force to backup)"
             return
         }
 
         $backup = "$Destination.bak.$(Get-Date -Format 'yyyyMMdd_HHmmss')"
         if ($DryRun) {
-            Write-Host "↻ would backup: $Destination -> $backup"
+            Write-Host "Would backup: $Destination -> $backup"
         } else {
             Move-Item -LiteralPath $Destination -Destination $backup
-            Write-Host "↻ backup: $Destination -> $backup"
+            Write-Host "Backup: $Destination -> $backup"
         }
     }
 
@@ -87,12 +87,12 @@ function New-DotfileLink([string]$Source, [string]$Destination) {
     $parent = Split-Path -Parent $Destination
     New-Item -ItemType Directory -Path $parent -Force | Out-Null
     New-Item -ItemType SymbolicLink -Path $Destination -Target $Source | Out-Null
-    Write-Host "✓ linked: $Destination -> $Source"
+    Write-Host "OK: linked: $Destination -> $Source"
 }
 
 function Link-Tree([string]$SourceRoot, [string]$DestinationRoot) {
     if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) {
-        Write-Host "⊘ skip tree (not found): $SourceRoot"
+        Write-Host "- skip tree (not found): $SourceRoot"
         return
     }
 
