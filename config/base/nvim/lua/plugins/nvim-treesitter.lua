@@ -26,6 +26,10 @@ return {
     lazy = false,
     build = ":TSUpdate",
     config = function()
+      if vim.fn.has("win32") == 1 and vim.fn.executable("clang") == 1 then
+        vim.env.CC = "clang"
+      end
+
       if #vim.api.nvim_list_uis() > 0 then
         if vim.fn.executable("tree-sitter") == 1 then
           require("nvim-treesitter").install(parsers)
