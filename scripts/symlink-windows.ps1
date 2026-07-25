@@ -90,7 +90,7 @@ function New-DotfileLink([string]$Source, [string]$Destination) {
     Write-Host "OK: linked: $Destination -> $Source"
 }
 
-function Link-Tree([string]$SourceRoot, [string]$DestinationRoot) {
+function Link-ConfigTree([string]$SourceRoot) {
     if (-not (Test-Path -LiteralPath $SourceRoot -PathType Container)) {
         Write-Host "- skip tree (not found): $SourceRoot"
         return
@@ -100,20 +100,33 @@ function Link-Tree([string]$SourceRoot, [string]$DestinationRoot) {
         Sort-Object FullName |
         ForEach-Object {
             $relative = $_.FullName.Substring($SourceRoot.Length).TrimStart("\", "/")
-            New-DotfileLink $_.FullName (Join-Path $DestinationRoot $relative)
+            if ($relative -like "nvim\*") {
+                $destination = Join-Path $env:LOCALAPPDATA $relative
+            } else {
+                $destination = Join-Path $ConfigDir $relative
+            }
+            New-DotfileLink $_.FullName $destination
         }
 }
 
 Write-Host "OS: windows"
 
 Write-Section "Base config"
-Link-Tree (Join-Path $dotfilesRoot "config/base") $ConfigDir
+Link-ConfigTree (Join-Path $dotfilesRoot "config/base")
 
 Write-Section "windows config"
-Link-Tree (Join-Path $dotfilesRoot "config/windows") $ConfigDir
+Link-ConfigTree (Join-Path $dotfilesRoot "config/windows")
 
 Write-Section "Base home"
-Link-Tree (Join-Path $dotfilesRoot "home/base") $HOME
+New-DotfileLink `
+    (Join-Path $dotfilesRoot "home/base/.codex/AGENTS.md") `
+    (Join-Path $HOME ".codex/AGENTS.md")
 
 Write-Section "windows home"
-Link-Tree (Join-Path $dotfilesRoot "home/windows") $HOME
+$documentsDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
+New-DotfileLink `
+    (Join-Path $dotfilesRoot "home/windows/Documents/WindowsPowerShell/Microsoft.PowerShell_profile.ps1") `
+    (Join-Path $documentsDir "WindowsPowerShell/Microsoft.PowerShell_profile.ps1")
+New-DotfileLink `
+    (Join-Path $dotfilesRoot "home/windows/Documents/PowerShell/Microsoft.PowerShell_profile.ps1") `
+    (Join-Path $documentsDir "PowerShell/Microsoft.PowerShell_profile.ps1")

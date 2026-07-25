@@ -86,14 +86,29 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -DryRun -Force
 
 安装程序会依次：
 
-1. 将共享配置链接到 `$HOME\.config` 和用户主目录。
+1. 将适用于 Windows 的共享配置链接到各软件的原生配置位置；Neovim 配置使用 `$env:LOCALAPPDATA\nvim`。
 2. 应用 `config/windows` 和 `home/windows` 中存在的 Windows 专属覆盖。
 3. 使用 `winget` 安装 `packages/packages.conf` 中的 Windows 软件。
 4. 使用 mise 安装共享配置中声明的 Python、Node.js、Java 和 .NET。
-5. 通过 PowerShell profile 激活 mise、zoxide 和 Starship。
+5. 通过 PowerShell profile 提供 `vim`/`vi` 别名，并激活 mise、zoxide 和 Starship。
 6. 将 WezTerm 的默认 shell 设置为 PowerShell 7。
 
 如果当前终端使用 PowerShell 7，也可以将命令中的 `powershell` 换成 `pwsh`。
+
+Windows 下各配置的链接目标如下：
+
+| 配置 | 链接目标 |
+| --- | --- |
+| Neovim | `$env:LOCALAPPDATA\nvim` |
+| WezTerm | `$HOME\.config\wezterm\wezterm.lua` |
+| mise | `$HOME\.config\mise\config.toml` |
+| Starship | `$HOME\.config\starship.toml` |
+| OpenCode | `$HOME\.config\opencode` |
+| Codex | `$HOME\.codex\AGENTS.md` |
+| Windows PowerShell 5.1 profile | Windows 实际“文档”目录下的 `WindowsPowerShell\Microsoft.PowerShell_profile.ps1` |
+| PowerShell 7 profile | Windows 实际“文档”目录下的 `PowerShell\Microsoft.PowerShell_profile.ps1` |
+
+PowerShell profile 的目标通过 Windows“文档”已知文件夹获取，因此在“文档”被 OneDrive 或系统策略重定向时不会写到错误位置。`.zshrc` 和 `.tmux.conf` 只适用于 Unix shell，Windows 安装程序不会链接它们。
 
 ## 安装参数
 
@@ -125,7 +140,7 @@ config/base/       三个平台共享的 XDG 配置
 config/macos/      macOS 专属配置
 config/linux/      Linux 专属配置
 config/windows/    Windows 专属配置
-home/base/         三个平台共享的主目录配置
+home/base/         跨平台共享的主目录配置（安装时按平台选择适用文件）
 home/macos/        macOS 专属主目录配置
 home/linux/        Linux 专属主目录配置
 home/windows/      Windows 专属主目录配置
