@@ -2,6 +2,7 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local is_mac = wezterm.target_triple:find("darwin") ~= nil
 local is_linux = wezterm.target_triple:find("linux") ~= nil
+local is_windows = wezterm.target_triple:find("windows") ~= nil
 
 -- ==================== Font ====================
 config.font = wezterm.font("JetBrainsMono Nerd Font")
@@ -111,6 +112,8 @@ if is_mac then
 	config.default_prog = { "/bin/zsh" }
 elseif is_linux then
 	config.default_prog = { "/usr/bin/zsh" }
+elseif is_windows then
+	config.default_prog = { "pwsh.exe", "-NoLogo" }
 end
 
 -- ==================== Misc ====================
