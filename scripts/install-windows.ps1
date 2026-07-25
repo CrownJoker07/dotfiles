@@ -27,16 +27,21 @@ $packages = $packages | Sort-Object -Unique
 Write-Host
 Write-Host "=== winget packages ==="
 
+$installedPackages = (& winget list --accept-source-agreements 2>&1) -join [Environment]::NewLine
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to read installed packages from winget."
+}
+
 $failed = @()
 foreach ($package in $packages) {
-    & winget list --id $package --exact --accept-source-agreements *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $packagePattern = "(?m)(^|\s)$([Regex]::Escape($package))(\s|$)"
+    if ($installedPackages -match $packagePattern) {
         Write-Host "OK: $package"
         continue
     }
 
     Write-Host "Installing: $package"
-    & winget install --id $package --exact --accept-package-agreements --accept-source-agreements
+    & winget install --id $package --exact --no-upgrade --accept-package-agreements --accept-source-agreements
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED: $package"
         $failed += $package
