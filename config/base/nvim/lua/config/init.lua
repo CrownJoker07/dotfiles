@@ -1,5 +1,6 @@
 local before_plugins = {
   "options",
+  "highlights",
   "netrw",
   "keymaps",
   "autocmds",

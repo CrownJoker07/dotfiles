@@ -38,7 +38,7 @@ require("lazy").setup({
     version = false,
   },
   install = {
-    colorscheme = { "catppuccin-mocha", "habamax" },
+    colorscheme = { "habamax" },
   },
   local_spec = false,
   checker = {

@@ -26,6 +26,7 @@ opt.completeopt = {
 -- external edits from AI/tools rely on the checktime autocmds in autocmds.lua.
 opt.autoread = true
 opt.termguicolors = true
+vim.cmd.colorscheme("habamax")
 opt.signcolumn = "yes"
 opt.undofile = true
 
