@@ -8,17 +8,31 @@ XDG_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 DRY_RUN=false
 export DOTFILES_DIR XDG_CONFIG_DIR
 
-usage() { echo "Usage: $0 [-d] [-f] [-h]\n  -d  Dry run\n  -f  Force overwrite\n  -h  Help"; exit 0; }
+if [ "$#" -ne 0 ]; then
+  echo "Usage: $0"
+  exit 1
+fi
 
-while getopts "dfh" opt; do
-  case "$opt" in d) DRY_RUN=true ;; f) FORCE=true ;; *) usage ;; esac
+echo "Select install mode:"
+echo "  1) Install (backup and replace existing files)"
+echo "  2) Preview (backup and replace existing files)"
+while true; do
+  IFS= read -r -n 1 -p "Enter 1 or 2: " INSTALL_MODE
+  echo
+  case "$INSTALL_MODE" in
+    1) break ;;
+    2) DRY_RUN=true; break ;;
+    *) echo "Invalid selection." ;;
+  esac
 done
 
 echo "Dotfiles dir: $DOTFILES_DIR"
 echo "Config dir:   $XDG_CONFIG_DIR"
 echo
 
-"$DOTFILES_DIR/scripts/symlink.sh" "$@"
+SYMLINK_ARGS=("-f")
+[ "$DRY_RUN" = true ] && SYMLINK_ARGS+=("-d")
+"$DOTFILES_DIR/scripts/symlink.sh" "${SYMLINK_ARGS[@]}"
 
 INSTALL_STATUS=0
 if [ "$DRY_RUN" = true ]; then
