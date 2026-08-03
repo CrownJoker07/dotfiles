@@ -2,6 +2,7 @@ local servers = {
   "bashls",
   "clangd",
   "roslyn",
+  "rust_analyzer",
 }
 
 local M = {}

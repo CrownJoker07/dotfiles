@@ -4,6 +4,7 @@ local tools = {
   "csharpier",
   "prettier",
   "roslyn-language-server",
+  "rust-analyzer",
   "shfmt",
   "stylua",
   "tree-sitter-cli",
