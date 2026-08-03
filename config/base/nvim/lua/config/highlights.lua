@@ -5,6 +5,8 @@ local function apply()
     ["@constructor"] = "Type",
     ["@function"] = "Function",
     ["@function.method"] = "Function",
+    ["@function.call"] = "Statement",
+    ["@function.method.call"] = "Statement",
     ["@variable.parameter"] = "Special",
     ["@variable.member"] = "PreProc",
     ["@property"] = "PreProc",

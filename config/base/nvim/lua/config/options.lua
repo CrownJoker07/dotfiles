@@ -27,6 +27,8 @@ opt.completeopt = {
 opt.autoread = true
 opt.termguicolors = true
 vim.cmd.colorscheme("habamax")
+-- Let semantic tokens fill gaps without overriding Tree-sitter captures.
+vim.hl.priorities.semantic_tokens = vim.hl.priorities.treesitter - 3
 opt.signcolumn = "yes"
 opt.undofile = true
 
