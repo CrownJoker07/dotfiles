@@ -37,6 +37,25 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = augroup("lsp_project_restart"),
+  desc = "Track project files that require an LSP restart",
+  callback = function(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client then
+      require("config.lsp").track(client)
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("FocusGained", {
+  group = augroup("lsp_project_restart_check"),
+  desc = "Restart LSP clients after project files change",
+  callback = function()
+    require("config.lsp").check()
+  end,
+})
+
 -- Native LSP completion
 vim.api.nvim_create_autocmd("LspAttach", {
   group = lsp_completion_group,

@@ -2,7 +2,15 @@ local root_markers = { ".sln", ".slnx", ".slnf", ".csproj", ".git" }
 
 return {
   name = "roslyn",
+  restart_files = { "%.slnx?$", "%.slnf$", "%.csproj$" },
   config = {
+    capabilities = {
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = false,
+        },
+      },
+    },
     cmd = {
       "roslyn-language-server",
       "--stdio",
