@@ -1,5 +1,9 @@
+[settings]
+node.corepack = true
+
 [tools]
 dotnet = ["6.0.428", "8.0.421", "9.0.314", "10.0"]
 java = "openjdk-17"
 node = "lts"
 python = "latest"
+rust = "stable"
