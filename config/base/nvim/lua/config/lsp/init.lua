@@ -3,6 +3,7 @@ local servers = {
   "clangd",
   "roslyn",
   "rust_analyzer",
+  "ts_ls",
 }
 
 local M = {}

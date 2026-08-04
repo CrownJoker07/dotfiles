@@ -8,6 +8,7 @@ local tools = {
   "shfmt",
   "stylua",
   "tree-sitter-cli",
+  "typescript-language-server",
 }
 
 return {
