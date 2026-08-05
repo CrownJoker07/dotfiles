@@ -24,6 +24,23 @@ package names, paths, and desktop behavior.
   name. For example, Homebrew cask `codex` corresponds to Arch `openai-codex`.
 - Do not add unrelated refactors or style churn while changing dotfiles.
 
+## OpenCode Model Maintenance
+
+- Use the Alibaba Cloud Model Studio text-generation model catalog as the
+  source of truth when synchronizing Alibaba Cloud models in
+  `config/base/opencode/opencode.json`:
+  <https://www.alibabacloud.com/help/zh/model-studio/text-generation-model/>
+- When asked to synchronize models, fetch the current catalog and use only the
+  model IDs in the "Model Studio recommendations" column of the migration
+  table, across its high-capability, balanced, and lightweight/low-cost tiers.
+  The "Closed-source model representatives" column is comparison context only
+  and must not be treated as a source of model IDs. Do not add other models
+  from the catalog.
+- Add newly recommended model IDs and remove model IDs that are no longer in
+  those three recommendation tiers.
+- Match model IDs exactly and only add models compatible with the configured
+  provider, API protocol, and subscription plan.
+
 ## Package Management Rules
 
 - Do not add repository scripts that build system software from source.
