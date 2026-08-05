@@ -75,7 +75,7 @@ Run these checks after modifying installer scripts or package lists:
 bash -n install.sh scripts/install-arch.sh scripts/install-macos.sh scripts/symlink.sh
 awk 'NF && $0 !~ /^#/ && $0 !~ /^\[[^]]+\]( # .*)?$/ && $0 !~ /^[a-z]+\.[a-z]+ = / { print FNR ": " $0; bad=1 } END { exit bad }' packages/packages.conf
 ! rg -n "makepkg|git clone https://aur.archlinux.org|base-devel|build-from-source|cargo install|go install|pip install|flatpak" scripts packages
-./install.sh -d
+printf '2\n' | ./install.sh
 ```
 
 The dry run should only report symlink actions and must not install packages.
