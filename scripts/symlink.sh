@@ -133,7 +133,7 @@ link_tree_files() {
     rel="${src#"$src_root"/}"
     dst="$dst_root/$rel"
     link_item "$src" "$dst"
-  done < <(find "$src_root" -type f | sort)
+  done < <(find "$src_root" -type f ! -name '.DS_Store' | sort)
 
   local find_depth=""
   [ -n "$maxdepth" ] && find_depth="-maxdepth $maxdepth"
