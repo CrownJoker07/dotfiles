@@ -5,6 +5,9 @@ return {
       "typescript-language-server",
       "--stdio",
     },
+    cmd_env = {
+      NODE_OPTIONS = "--max-old-space-size=8192",
+    },
     filetypes = {
       "javascript",
       "javascriptreact",
