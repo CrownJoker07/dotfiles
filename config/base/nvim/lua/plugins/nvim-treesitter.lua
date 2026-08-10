@@ -5,6 +5,7 @@ local parsers = {
   "lua",
   "markdown",
   "markdown_inline",
+  "typescript",
   "vim",
   "vimdoc",
 }
@@ -17,6 +18,8 @@ local filetypes = {
   "lua",
   "markdown",
   "sh",
+  "typescript",
+  "typescriptreact",
   "vim",
 }
 
