@@ -5,8 +5,8 @@ return {
       "typescript-language-server",
       "--stdio",
     },
-    cmd_env = {
-      NODE_OPTIONS = "--max-old-space-size=8192",
+    init_options = {
+      maxTsServerMemory = 12288,
     },
     filetypes = {
       "javascript",
