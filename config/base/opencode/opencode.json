@@ -21,58 +21,22 @@
       },
       "models": {
         "qwen3.8-max": {
-          "name": "Qwen3.8 Max",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "Qwen3.8 Max"
         },
         "qwen3.7-plus": {
-          "name": "Qwen3.7 Plus",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "Qwen3.7 Plus"
         },
         "deepseek-v4-pro": {
-          "name": "DeepSeek V4 Pro",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "DeepSeek V4 Pro"
         },
         "glm-5.2": {
-          "name": "GLM-5.2",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "GLM-5.2"
         },
         "qwen3.7-flash": {
-          "name": "Qwen3.7 Flash",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "Qwen3.7 Flash"
         },
         "deepseek-v4-flash": {
-          "name": "DeepSeek V4 Flash",
-          "options": {
-            "thinking": {
-              "type": "enabled",
-              "budgetTokens": 1024
-            }
-          }
+          "name": "DeepSeek V4 Flash"
         },
         "MiniMax-M2.5": {
           "name": "MiniMax M2.5"
