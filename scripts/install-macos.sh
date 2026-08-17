@@ -137,7 +137,7 @@ install_brew_formulae() {
   local missing=()
   while IFS= read -r formula; do
     [ -z "$formula" ] && continue
-    if is_in_list "$formula" "$installed_formulae"; then
+    if is_in_list "${formula##*/}" "$installed_formulae"; then
       echo "✓ $formula"
     else
       missing+=("$formula")
@@ -150,6 +150,39 @@ install_brew_formulae() {
   fi
 
   echo "✓ brew formulae ready"
+}
+
+install_brew_binaries() {
+  section "Homebrew binary formulae"
+
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "⊘ skip: brew not found"
+    return 0
+  fi
+
+  local binary_list
+  binary_list="$(read_package_list macos.binary)" || return 0
+
+  local installed_formulae
+  installed_formulae="$(brew list --formula)" || return
+
+  local binary
+  local missing=()
+  while IFS= read -r binary; do
+    [ -z "$binary" ] && continue
+    if is_in_list "${binary##*/}" "$installed_formulae"; then
+      echo "✓ $binary"
+    else
+      missing+=("$binary")
+    fi
+  done <<< "$binary_list"
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    echo "→ installing ${#missing[@]} prebuilt binary formula(e): ${missing[*]}"
+    brew install "${missing[@]}" || return
+  fi
+
+  echo "✓ brew binary formulae ready"
 }
 
 install_brew_casks() {
@@ -253,6 +286,7 @@ print_failures() {
 run_step "Xcode Command Line Tools" install_xcode_clt
 run_step "Homebrew" install_homebrew
 run_step "Homebrew formulae" install_brew_formulae
+run_step "Homebrew binary formulae" install_brew_binaries
 run_step "Homebrew casks" install_brew_casks
 run_step "tmux plugins" install_tmux_plugins
 run_step "mise dev tools" install_mise_tools
