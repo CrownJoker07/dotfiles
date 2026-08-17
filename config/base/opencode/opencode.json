@@ -12,12 +12,12 @@
     "edit": "ask"
   },
   "provider": {
-    "bailian-coding-plan": {
-      "npm": "@ai-sdk/anthropic",
-      "name": "Alibaba Cloud Model Studio",
+    "internal-dev": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Alibaba Cloud Model Studio - internal dev",
       "options": {
-        "baseURL": "https://dashscope.aliyuncs.com/apps/anthropic/v1",
-        "apiKey": "{env:ALIBABA_BAILIAN_CODING_PLAN_API_KEY}"
+        "baseURL": "{env:ALIBABA_BAILIAN_INTERNAL_DEV_BASE_URL}",
+        "apiKey": "{env:ALIBABA_BAILIAN_INTERNAL_DEV_API_KEY}"
       },
       "models": {
         "qwen3.8-max": {
