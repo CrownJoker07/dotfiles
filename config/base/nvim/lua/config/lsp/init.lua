@@ -1,7 +1,6 @@
 local servers = {
   "bashls",
   "clangd",
-  "mpls",
   "roslyn",
   "rust_analyzer",
   "ts_ls",
