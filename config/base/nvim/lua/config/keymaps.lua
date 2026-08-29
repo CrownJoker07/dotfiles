@@ -94,6 +94,31 @@ map("n", "<leader>oi", function()
   vim.ui.open(path)
 end, opts("Open current file with system viewer"))
 
+-- Open current repository in a new Visual Studio Code window at the current file
+map("n", "<leader>ov", function()
+  if vim.fn.executable("code") == 0 then
+    vim.notify("Visual Studio Code CLI is not installed", vim.log.levels.ERROR)
+    return
+  end
+
+  local path = vim.fn.expand("%:p")
+  if path == "" then
+    vim.notify("Current buffer has no file", vim.log.levels.ERROR)
+    return
+  end
+
+  local root = vim.fs.root(path, ".git")
+  if not root then
+    vim.notify("Current file is not in a Git repository", vim.log.levels.ERROR)
+    return
+  end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local location = string.format("%s:%d:%d", path, cursor[1], cursor[2] + 1)
+
+  vim.fn.jobstart({ "code", "--new-window", root, "--goto", location }, { detach = true })
+end, opts("Open repository in Visual Studio Code"))
+
 -- Open current buffer directory with system file manager
 map("n", "<leader>od", function()
   local path = vim.api.nvim_buf_get_name(0)
