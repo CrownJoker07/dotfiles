@@ -40,7 +40,6 @@ return {
         css = { "prettier" },
         html = { "prettier" },
         markdown = { "prettier" },
-        cs = { "csharpier" },
         sh = { "shfmt" },
         bash = { "shfmt" },
       },
@@ -51,11 +50,6 @@ return {
           end,
         },
         stylua = {
-          cwd = function(_, ctx)
-            return editorconfig_root(ctx.buf)
-          end,
-        },
-        csharpier = {
           cwd = function(_, ctx)
             return editorconfig_root(ctx.buf)
           end,

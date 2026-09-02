@@ -1,7 +1,6 @@
 local tools = {
   "bash-language-server",
   "clangd",
-  "csharpier",
   "prettier",
   "roslyn-language-server",
   "rust-analyzer",
