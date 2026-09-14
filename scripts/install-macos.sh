@@ -104,7 +104,7 @@ install_homebrew() {
   echo "→ installing..."
   local installer
   installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" || return
-  NONINTERACTIVE=1 /bin/bash -c "$installer" || return
+  /bin/bash -c "$installer" || return
 
   if [ -f /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)" || return
