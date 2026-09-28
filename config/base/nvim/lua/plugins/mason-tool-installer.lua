@@ -2,6 +2,7 @@ local tools = {
   "bash-language-server",
   "clangd",
   "prettier",
+  "pyright",
   "roslyn-language-server",
   "rust-analyzer",
   "shfmt",
