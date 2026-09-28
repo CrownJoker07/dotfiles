@@ -8,6 +8,10 @@
 - Ask the user for explicit permission before running any command that installs or updates dependencies or developer tools.
 - Install project dependencies only through the project's existing package manager and project-local isolated environment. For Python, use the project's `.venv`; never install into the system or user Python environment.
 
+### Git Staging
+
+- Do not proactively update Git's staging area. Without the user's explicit request, do not run `git add` or otherwise add changes to the staging area, and do not run `git restore --staged`, `git reset`, `git rm --cached`, or otherwise remove, overwrite, or rebuild existing staged content. Any staging state manually created by the user is existing user work and must be preserved as-is; when the staging area and working tree differ, do not proactively modify either one to “unify” their state.
+
 ### Keep Scope Minimal
 
 - Implement only what the user explicitly requested.
