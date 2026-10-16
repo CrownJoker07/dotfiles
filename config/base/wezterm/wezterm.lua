@@ -31,7 +31,7 @@ config.hide_tab_bar_if_only_one_tab = true
 
 -- ==================== Shell ====================
 if is_mac then
-	config.default_prog = { "/bin/zsh" }
+	config.default_prog = { "/bin/zsh", "-l" }
 elseif is_linux then
 	config.default_prog = { "/usr/bin/zsh" }
 elseif is_windows then
