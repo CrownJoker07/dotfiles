@@ -35,34 +35,76 @@ map("i", "<C-Space>", function()
   end
 end, opts("Trigger LSP completion"))
 
--- Open lazygit
-map("n", "<leader>gg", function()
+local function open_lazygit(args)
   if vim.fn.executable("lazygit") == 0 then
     vim.notify("lazygit is not installed", vim.log.levels.ERROR)
     return
   end
 
-  vim.cmd("tabnew")
-  vim.cmd("terminal lazygit")
+  local original_columns = vim.o.columns
+  local original_showtabline = vim.o.showtabline
+  local zoomed_tmux_pane = false
+  if vim.env.TMUX then
+    local zoomed = vim.trim(vim.fn.system({ "tmux", "display-message", "-p", "#{window_zoomed_flag}" }))
+    if vim.v.shell_error == 0 and zoomed == "0" then
+      vim.fn.system({ "tmux", "resize-pane", "-Z" })
+      zoomed_tmux_pane = vim.v.shell_error == 0
+    end
+  end
+  vim.o.showtabline = 0
+  if zoomed_tmux_pane then
+    vim.wait(500, function()
+      return vim.o.columns ~= original_columns
+    end)
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  local width = math.max(1, vim.o.columns - 2)
+  local height = math.max(1, vim.o.lines - vim.o.cmdheight - 3)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    row = 0,
+    col = 0,
+    width = width,
+    height = height,
+    style = "minimal",
+    border = "rounded",
+  })
+  vim.api.nvim_set_option_value("winhighlight", "Normal:Normal,FloatBorder:FloatBorder", { win = win })
+
+  vim.fn.termopen(args, {
+    on_exit = function()
+      vim.schedule(function()
+        if vim.api.nvim_win_is_valid(win) then
+          vim.api.nvim_win_close(win, true)
+        end
+        if vim.api.nvim_buf_is_valid(buf) then
+          vim.api.nvim_buf_delete(buf, { force = true })
+        end
+        if zoomed_tmux_pane then
+          vim.fn.system({ "tmux", "resize-pane", "-Z" })
+        end
+        vim.o.showtabline = original_showtabline
+      end)
+    end,
+  })
   vim.cmd("startinsert")
+end
+
+-- Open lazygit
+map("n", "<leader>gg", function()
+  open_lazygit({ "lazygit" })
 end, opts("Open Lazygit"))
 
 -- Open current file history in lazygit
 map("n", "<leader>gh", function()
-  if vim.fn.executable("lazygit") == 0 then
-    vim.notify("lazygit is not installed", vim.log.levels.ERROR)
-    return
-  end
-
   local path = vim.fn.expand("%:p")
   if path == "" then
     vim.notify("Current buffer has no file", vim.log.levels.ERROR)
     return
   end
 
-  vim.cmd("tabnew")
-  vim.cmd("terminal lazygit --filter " .. vim.fn.shellescape(path))
-  vim.cmd("startinsert")
+  open_lazygit({ "lazygit", "--filter", path })
 end, opts("Open current file history in Lazygit"))
 
 -- Open git remote repository
