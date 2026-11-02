@@ -35,9 +35,6 @@
         "glm-5.2": {
           "name": "GLM-5.2"
         },
-        "deepseek-v4-flash": {
-          "name": "DeepSeek V4 Flash"
-        },
         "MiniMax-M2.5": {
           "name": "MiniMax M2.5"
         }
