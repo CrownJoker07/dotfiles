@@ -3,16 +3,8 @@
   "default_agent": "build",
   "instructions": ["~/.codex/AGENTS.md"],
   "lsp": true,
-  "permission": {
-    "read": "allow",
-    "glob": "allow",
-    "grep": "allow",
-    "external_directory": "allow",
-    "bash": "allow",
-    "edit": "ask"
-  },
   "provider": {
-    "internal-dev": {
+    "alibaba-bailian-internal-dev": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Alibaba Cloud Model Studio - internal dev",
       "options": {
@@ -53,6 +45,19 @@
         },
         "deepseek-v4-pro": {
           "name": "DeepSeek V4 Pro"
+        }
+      }
+    },
+    "token-factory": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Token Factory",
+      "options": {
+        "baseURL": "https://proxy.token-factory.digicore-ai.com/v1",
+        "apiKey": "{env:TF_API_KEY}"
+      },
+      "models": {
+        "deepseek-v4.1-flash": {
+          "name": "DeepSeek V4.1 Flash"
         }
       }
     }
