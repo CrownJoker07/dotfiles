@@ -118,9 +118,11 @@ Write-Section "windows config"
 Link-ConfigTree (Join-Path $dotfilesRoot "config/windows")
 
 Write-Section "Base home"
-New-DotfileLink `
-    (Join-Path $dotfilesRoot "home/base/.codex/AGENTS.md") `
-    (Join-Path $HOME ".codex/AGENTS.md")
+Get-ChildItem -LiteralPath (Join-Path $dotfilesRoot "home/base/.codex") -File |
+    Sort-Object Name |
+    ForEach-Object {
+        New-DotfileLink $_.FullName (Join-Path $HOME ".codex/$($_.Name)")
+    }
 
 Write-Section "windows home"
 $documentsDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)

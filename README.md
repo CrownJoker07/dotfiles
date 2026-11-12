@@ -95,8 +95,7 @@ Windows 下各配置的链接目标如下：
 | WezTerm | `$HOME\.config\wezterm\wezterm.lua` |
 | mise | `$HOME\.config\mise\config.toml` |
 | Starship | `$HOME\.config\starship.toml` |
-| OpenCode | `$HOME\.config\opencode` |
-| Codex | `$HOME\.codex\AGENTS.md` |
+| Codex | `$HOME\.codex\AGENTS.md`、`$HOME\.codex\dotfiles.config.toml` |
 | Windows PowerShell 5.1 profile | Windows 实际“文档”目录下的 `WindowsPowerShell\Microsoft.PowerShell_profile.ps1` |
 | PowerShell 7 profile | Windows 实际“文档”目录下的 `PowerShell\Microsoft.PowerShell_profile.ps1` |
 
@@ -142,6 +141,42 @@ scripts/           软链接和平台安装脚本
 ```
 
 平台专属文件会覆盖同路径的共享文件。当前不存在的平台目录会被自动跳过，不需要创建空目录。
+
+## Codex
+
+`home/base/.codex/dotfiles.config.toml` 安装时链接到 `~/.codex/dotfiles.config.toml`。
+运行 `codex -p dotfiles`，在本机 `~/.codex/config.toml` 上叠加共享配置；同名设置
+由 profile 覆盖，其余本机设置保留。直接运行 `codex` 则使用本机配置。
+需要 Codex CLI 0.134.0 或更新版本。
+
+```sh
+codex -p dotfiles
+codex -p dotfiles -c 'model_provider="deepseek"' -m deepseek-v4-pro
+codex -p dotfiles -c 'model_provider="token-factory"' -m deepseek-v4.1-flash
+```
+
+密钥参考 `secrets/codex.example`，在本机设置环境变量。macOS / Linux 可将填写后的
+文件保存为 `~/.secrets/codex`，由 `.zshrc` 加载；Windows 自行设置对应环境变量。
+
+百炼内部 provider 在本机 `~/.codex/config.toml` 中配置（已有同名表时直接编辑）：
+
+```toml
+# Models: qwen3.8-max, qwen3.7-plus, qwen3.8-flash,
+#         deepseek-v4-pro, glm-5.2, MiniMax-M2.5
+[model_providers.alibaba-bailian-internal-dev]
+name = "Alibaba Cloud Model Studio - internal dev"
+base_url = "https://your-workspace-host/compatible-mode/v1"
+env_key = "ALIBABA_BAILIAN_INTERNAL_DEV_API_KEY"
+wire_api = "responses"
+```
+
+将 `base_url` 替换为真实内部地址，再运行：
+
+```sh
+codex -p dotfiles -c 'model_provider="alibaba-bailian-internal-dev"' -m qwen3.8-max
+```
+
+百炼内部端点和 Token Factory 的 Responses API 兼容性仍待验证。
 
 ## 软件包清单
 
